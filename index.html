@@ -400,7 +400,7 @@ async function fetchStats(dateKey, id) {
   try {
     if (!t.stats) t.stats = {};
 
-    // Previous close (free tier)
+    // Previous close — price, volume, change
     const aggRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?adjusted=true&apiKey=${POLYGON_KEY}`);
     const aggData = await aggRes.json();
     const bar     = aggData?.results?.[0];
@@ -409,12 +409,11 @@ async function fetchStats(dateKey, id) {
       t.stats.cvol   = bar.v ? formatVol(bar.v) : t.stats.cvol;
       t.stats.avgvol = bar.v ? formatVol(bar.v) : t.stats.avgvol;
       if (bar.o && bar.c) {
-        const chg = ((bar.c - bar.o) / bar.o * 100).toFixed(2);
-        t.stats.change = chg;
+        t.stats.change = ((bar.c - bar.o) / bar.o * 100).toFixed(2);
       }
     }
 
-    // Reference data: float, market cap (free tier)
+    // Reference data — float, market cap
     const detailRes  = await fetch(`https://api.polygon.io/v3/reference/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
     const detailData = await detailRes.json();
     const detail     = detailData?.results;
@@ -423,11 +422,32 @@ async function fetchStats(dateKey, id) {
       if (detail.market_cap)                     t.stats.mktcap = formatMktCap(detail.market_cap);
     }
 
-    // RSI (free tier)
+    // RSI — 14-period daily
     const rsiRes  = await fetch(`https://api.polygon.io/v1/indicators/rsi/${t.sym}?timespan=day&window=14&series_type=close&limit=1&apiKey=${POLYGON_KEY}`);
     const rsiData = await rsiRes.json();
     const rsiVal  = rsiData?.results?.values?.[0]?.value;
     if (rsiVal) t.stats.rsi = rsiVal.toFixed(1);
+
+    // ATR — calculated from 15 daily bars (14-period true range average)
+    const today = new Date();
+    const from  = new Date(today); from.setDate(from.getDate() - 30);
+    const fromStr = from.toISOString().slice(0, 10);
+    const toStr   = today.toISOString().slice(0, 10);
+    const atrBarsRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/range/1/day/${fromStr}/${toStr}?adjusted=true&sort=desc&limit=15&apiKey=${POLYGON_KEY}`);
+    const atrBarsData = await atrBarsRes.json();
+    const bars = atrBarsData?.results;
+    if (bars && bars.length >= 2) {
+      const trValues = [];
+      for (let i = 0; i < bars.length - 1; i++) {
+        const high  = bars[i].h;
+        const low   = bars[i].l;
+        const prevC = bars[i + 1].c;
+        const tr = Math.max(high - low, Math.abs(high - prevC), Math.abs(low - prevC));
+        trValues.push(tr);
+      }
+      const atr = trValues.slice(0, 14).reduce((a, b) => a + b, 0) / Math.min(trValues.length, 14);
+      t.stats.atr = atr.toFixed(2);
+    }
 
     saveJournal();
     renderJournal();
