@@ -58,6 +58,8 @@
     transition: background 0.2s, color 0.2s;
   }
 
+  .page-wrap { max-width: 1200px; margin: 0 auto; }
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -159,28 +161,34 @@
   .ticker-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; margin-bottom: 10px; overflow: hidden;
+    display: grid; grid-template-columns: 260px 1fr 1fr;
     transition: border-color 0.15s;
   }
   .ticker-card:hover { border-color: var(--border-light); }
 
-  .ticker-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 9px 14px; border-bottom: 1px solid var(--border);
-    background: var(--surface2);
+  .card-left {
+    background: var(--surface2); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; padding: 12px 14px; gap: 10px;
   }
-  .ticker-header-left { display: flex; align-items: center; gap: 10px; }
+  .card-left-top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .card-left-title { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .ticker-symbol {
-    font-family: 'IBM Plex Mono', monospace; font-size: 14px;
-    font-weight: 600; letter-spacing: 0.5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+    font-weight: 700; letter-spacing: 0.5px;
   }
-  .ticker-note { font-size: 12px; color: var(--text-dim); font-style: italic; }
-  .ticker-header-right { display: flex; align-items: center; gap: 8px; }
+  .ticker-note {
+    font-size: 11px; color: var(--text-dim); font-style: italic;
+    word-break: break-word; line-height: 1.4;
+  }
+  .card-left-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
 
   .fetch-btn {
     background: var(--accent-dim); border: 1px solid var(--accent);
     border-radius: 4px; color: var(--accent); cursor: pointer;
     font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    font-weight: 600; padding: 4px 12px; letter-spacing: 0.5px;
+    font-weight: 600; padding: 4px 10px; letter-spacing: 0.5px;
     transition: all 0.15s; white-space: nowrap;
   }
   .fetch-btn:hover { background: var(--accent); color: #fff; }
@@ -189,23 +197,20 @@
   .btn-remove {
     background: transparent; border: 1px solid transparent;
     border-radius: 4px; color: var(--text-muted); cursor: pointer;
-    font-size: 10px; padding: 3px 8px; transition: all 0.15s;
-    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; padding: 3px 6px; transition: all 0.15s;
+    font-family: 'IBM Plex Mono', monospace; text-align: center;
   }
   .btn-remove:hover { border-color: var(--red); color: var(--red); }
 
-  .stats-row {
-    display: flex; align-items: stretch;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    overflow-x: auto;
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: 5px; overflow: hidden;
   }
   .stat-cell {
-    display: flex; flex-direction: column; gap: 4px;
-    padding: 7px 10px; border-right: 1px solid var(--border);
-    min-width: 68px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 5px 8px; background: var(--surface2);
   }
-  .stat-cell:last-child { border-right: none; flex: 1; }
   .stat-cell-label {
     font-size: 9px; color: var(--text-muted);
     text-transform: uppercase; letter-spacing: 0.5px;
@@ -223,7 +228,7 @@
   .stat-cell input.neg { color: var(--red); }
   .stat-cell input::placeholder { color: var(--text-muted); opacity: 0.6; }
 
-  .panels { display: grid; grid-template-columns: 1fr 1fr; }
+  .panels { display: contents; }
   .panel { padding: 12px 14px; }
   .panel-long {
     border-right: 1px solid var(--border);
@@ -305,6 +310,8 @@
 </head>
 <body>
 
+<div class="page-wrap">
+
 <div class="header">
   <div class="header-left">
     <h1>Daily Game Plan</h1>
@@ -332,6 +339,8 @@
 </div>
 
 <div id="journal"></div>
+
+</div>
 
 <script>
 const STORAGE_KEY  = 'dgp_journal_v2';
@@ -650,30 +659,32 @@ function renderCard(dk, t) {
 
   return `
   <div class="ticker-card" id="card-${dk}-${t.id}">
-    <div class="ticker-header">
-      <div class="ticker-header-left">
-        <span class="ticker-symbol">${t.sym}</span>
-        <span class="ticker-note">${t.note || ''}</span>
+    <div class="card-left">
+      <div class="card-left-top">
+        <div class="card-left-title">
+          <span class="ticker-symbol">${t.sym}</span>
+          <span class="ticker-note">${t.note || ''}</span>
+        </div>
+        <div class="card-left-actions">
+          <button class="fetch-btn" id="fetch-${dk}-${t.id}"
+            onclick="fetchStats('${dk}',${t.id})">Fetch</button>
+          <button class="btn-remove" onclick="removeTicker('${dk}',${t.id})">✕</button>
+        </div>
       </div>
-      <div class="ticker-header-right">
-        <button class="fetch-btn" id="fetch-${dk}-${t.id}"
-          onclick="fetchStats('${dk}',${t.id})">Fetch</button>
-        <button class="btn-remove" onclick="removeTicker('${dk}',${t.id})">✕</button>
+      <div class="stats-grid">
+        ${statField('Price',   'price',  '0.00')}
+        ${statField('Chg %',   'change', '0.00%')}
+        ${statField('Float',   'float',  '—')}
+        ${statField('ATR',     'atr',    '0.00')}
+        ${statField('Cur Vol', 'cvol',   '—')}
+        ${statField('Avg Vol', 'avgvol', '—')}
+        ${statField('Rel Vol', 'relvol', '—')}
+        ${statField('Short %', 'short',  '—')}
+        ${statField('P/E',     'pe',     '—')}
+        ${statField('Margin',  'margin', '—')}
+        ${statField('RSI',     'rsi',    '—')}
+        ${statField('Mkt Cap', 'mktcap', '—')}
       </div>
-    </div>
-    <div class="stats-row">
-      ${statField('Price',   'price',  '0.00')}
-      ${statField('Chg %',   'change', '0.00%')}
-      ${statField('Float',   'float',  '—')}
-      ${statField('ATR',     'atr',    '0.00')}
-      ${statField('Cur Vol', 'cvol',   '—')}
-      ${statField('Avg Vol', 'avgvol', '—')}
-      ${statField('Rel Vol', 'relvol', '—')}
-      ${statField('Short %', 'short',  '—')}
-      ${statField('P/E',     'pe',     '—')}
-      ${statField('Margin',  'margin', '—')}
-      ${statField('RSI',     'rsi',    '—')}
-      ${statField('Mkt Cap', 'mktcap', '—')}
     </div>
     <div class="panels">
       ${renderPanel(dk, t, 'long')}
