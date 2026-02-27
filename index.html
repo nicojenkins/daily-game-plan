@@ -398,41 +398,32 @@ async function fetchStats(dateKey, id) {
   if (btn) { btn.textContent = '...'; btn.classList.add('loading'); }
 
   try {
-    const snapRes   = await fetch(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
-    const snapData  = await snapRes.json();
-    const snap      = snapData?.ticker;
+    if (!t.stats) t.stats = {};
 
+    // Previous close (free tier)
+    const aggRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?adjusted=true&apiKey=${POLYGON_KEY}`);
+    const aggData = await aggRes.json();
+    const bar     = aggData?.results?.[0];
+    if (bar) {
+      t.stats.price  = bar.c ? bar.c.toFixed(2) : t.stats.price;
+      t.stats.cvol   = bar.v ? formatVol(bar.v) : t.stats.cvol;
+      t.stats.avgvol = bar.v ? formatVol(bar.v) : t.stats.avgvol;
+      if (bar.o && bar.c) {
+        const chg = ((bar.c - bar.o) / bar.o * 100).toFixed(2);
+        t.stats.change = chg;
+      }
+    }
+
+    // Reference data: float, market cap (free tier)
     const detailRes  = await fetch(`https://api.polygon.io/v3/reference/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
     const detailData = await detailRes.json();
     const detail     = detailData?.results;
-
-    if (snap) {
-      const day    = snap.day || {};
-      const prevDay = snap.prevDay || {};
-      const change = snap.todaysChangePerc;
-      const price  = day.c || snap.lastTrade?.p || '';
-      const cvol   = day.v ? formatVol(day.v) : '';
-      const relvol = (day.v && prevDay.v) ? (day.v / prevDay.v).toFixed(2) : '';
-
-      const aggRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?apiKey=${POLYGON_KEY}`);
-      const aggData = await aggRes.json();
-      const prevVol = aggData?.results?.[0]?.v;
-
-      if (!t.stats) t.stats = {};
-      t.stats.price  = price ? price.toFixed(2) : t.stats.price;
-      t.stats.change = change !== undefined ? change.toFixed(2) : t.stats.change;
-      t.stats.cvol   = cvol || t.stats.cvol;
-      t.stats.relvol = relvol || t.stats.relvol;
-      t.stats.avgvol = prevVol ? formatVol(prevVol) : t.stats.avgvol;
-    }
-
     if (detail) {
-      const float  = detail.share_class_shares_outstanding;
-      const mktcap = detail.market_cap;
-      if (float)  t.stats.float  = formatVol(float);
-      if (mktcap) t.stats.mktcap = formatMktCap(mktcap);
+      if (detail.share_class_shares_outstanding) t.stats.float  = formatVol(detail.share_class_shares_outstanding);
+      if (detail.market_cap)                     t.stats.mktcap = formatMktCap(detail.market_cap);
     }
 
+    // RSI (free tier)
     const rsiRes  = await fetch(`https://api.polygon.io/v1/indicators/rsi/${t.sym}?timespan=day&window=14&series_type=close&limit=1&apiKey=${POLYGON_KEY}`);
     const rsiData = await rsiRes.json();
     const rsiVal  = rsiData?.results?.values?.[0]?.value;
