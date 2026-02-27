@@ -26,6 +26,26 @@
     --accent-dim: rgba(108,122,255,0.12);
   }
 
+  body.light {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface2: #eef0f3;
+    --border: #d4d7de;
+    --border-light: #b8bcc8;
+    --text: #1a1d26;
+    --text-dim: #4a5068;
+    --text-muted: #9196a8;
+    --green: #007a4a;
+    --green-dim: rgba(0,122,74,0.07);
+    --green-mid: #005e38;
+    --red: #c0001f;
+    --red-dim: rgba(192,0,31,0.07);
+    --red-mid: #9a0019;
+    --gold: #b07d00;
+    --accent: #3d4fd6;
+    --accent-dim: rgba(61,79,214,0.10);
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -35,6 +55,7 @@
     font-size: 13px;
     min-height: 100vh;
     padding: 20px;
+    transition: background 0.2s, color 0.2s;
   }
 
   .header {
@@ -73,6 +94,14 @@
   }
   #accountSize { width: 85px; }
   #riskPct     { width: 45px; }
+
+  .theme-toggle {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text-dim); cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    padding: 6px 12px; transition: all 0.15s; white-space: nowrap;
+  }
+  .theme-toggle:hover { border-color: var(--border-light); color: var(--text); }
 
   .add-bar {
     display: flex; gap: 10px; margin-bottom: 24px; align-items: stretch;
@@ -243,6 +272,8 @@
   .results { border-radius: 5px; padding: 8px 10px; }
   .panel-long  .results { background: rgba(0,200,122,0.06); border: 1px solid rgba(0,200,122,0.15); }
   .panel-short .results { background: rgba(255,77,106,0.06); border: 1px solid rgba(255,77,106,0.15); }
+  body.light .panel-long  .results { background: rgba(0,122,74,0.06); border: 1px solid rgba(0,122,74,0.20); }
+  body.light .panel-short .results { background: rgba(192,0,31,0.05); border: 1px solid rgba(192,0,31,0.18); }
   .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
   .result-item { display: flex; justify-content: space-between; align-items: center; }
   .result-label {
@@ -288,6 +319,7 @@
       <label>Risk %</label>
       <input type="number" id="riskPct" value="0.5" step="0.1" oninput="saveSettings();recalcAll()">
     </div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Light</button>
   </div>
 </div>
 
@@ -304,10 +336,26 @@
 <script>
 const STORAGE_KEY  = 'dgp_journal_v2';
 const SETTINGS_KEY = 'dgp_settings_v1';
+const THEME_KEY    = 'dgp_theme_v1';
+const POLYGON_KEY  = '2UzhPEeHv7rRDqYbeg0ocy2XBA2hwUFN';
 
 let journal  = {};
 let settings = { accountSize: 25500, riskPct: 0.5 };
 let collapsed = {};
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  document.getElementById('themeToggle').textContent = isLight ? '🌙 Dark' : '☀ Light';
+  localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('themeToggle').textContent = '🌙 Dark';
+  }
+}
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -326,7 +374,7 @@ function loadAll() {
   document.getElementById('riskPct').value     = settings.riskPct;
 }
 
-function saveJournal()  { localStorage.setItem(STORAGE_KEY,  JSON.stringify(journal));  }
+function saveJournal()  { localStorage.setItem(STORAGE_KEY, JSON.stringify(journal)); }
 function saveSettings() {
   settings.accountSize = parseFloat(document.getElementById('accountSize').value) || 25500;
   settings.riskPct     = parseFloat(document.getElementById('riskPct').value) || 0.5;
@@ -389,8 +437,6 @@ function getTicker(dateKey, id) {
   return day.tickers.find(t => t.id === id) || null;
 }
 
-const POLYGON_KEY = '2UzhPEeHv7rRDqYbeg0ocy2XBA2hwUFN';
-
 async function fetchStats(dateKey, id) {
   const t = getTicker(dateKey, id);
   if (!t) return;
@@ -400,7 +446,6 @@ async function fetchStats(dateKey, id) {
   try {
     if (!t.stats) t.stats = {};
 
-    // Previous close — price, volume, change
     const aggRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?adjusted=true&apiKey=${POLYGON_KEY}`);
     const aggData = await aggRes.json();
     const bar     = aggData?.results?.[0];
@@ -413,7 +458,6 @@ async function fetchStats(dateKey, id) {
       }
     }
 
-    // Reference data — float, market cap
     const detailRes  = await fetch(`https://api.polygon.io/v3/reference/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
     const detailData = await detailRes.json();
     const detail     = detailData?.results;
@@ -422,27 +466,26 @@ async function fetchStats(dateKey, id) {
       if (detail.market_cap)                     t.stats.mktcap = formatMktCap(detail.market_cap);
     }
 
-    // RSI — 14-period daily
     const rsiRes  = await fetch(`https://api.polygon.io/v1/indicators/rsi/${t.sym}?timespan=day&window=14&series_type=close&limit=1&apiKey=${POLYGON_KEY}`);
     const rsiData = await rsiRes.json();
     const rsiVal  = rsiData?.results?.values?.[0]?.value;
     if (rsiVal) t.stats.rsi = rsiVal.toFixed(1);
 
-    // ATR — calculated from 15 daily bars (14-period true range average)
-    const today = new Date();
-    const from  = new Date(today); from.setDate(from.getDate() - 30);
+    const today   = new Date();
+    const from    = new Date(today); from.setDate(from.getDate() - 40);
     const fromStr = from.toISOString().slice(0, 10);
     const toStr   = today.toISOString().slice(0, 10);
-    const atrBarsRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/range/1/day/${fromStr}/${toStr}?adjusted=true&sort=desc&limit=15&apiKey=${POLYGON_KEY}`);
-    const atrBarsData = await atrBarsRes.json();
-    const bars = atrBarsData?.results;
+    const atrRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/range/1/day/${fromStr}/${toStr}?adjusted=true&sort=desc&limit=20&apiKey=${POLYGON_KEY}`);
+    const atrData = await atrRes.json();
+    const bars    = atrData?.results;
     if (bars && bars.length >= 2) {
       const trValues = [];
       for (let i = 0; i < bars.length - 1; i++) {
-        const high  = bars[i].h;
-        const low   = bars[i].l;
-        const prevC = bars[i + 1].c;
-        const tr = Math.max(high - low, Math.abs(high - prevC), Math.abs(low - prevC));
+        const tr = Math.max(
+          bars[i].h - bars[i].l,
+          Math.abs(bars[i].h - bars[i + 1].c),
+          Math.abs(bars[i].l - bars[i + 1].c)
+        );
         trValues.push(tr);
       }
       const atr = trValues.slice(0, 14).reduce((a, b) => a + b, 0) / Math.min(trValues.length, 14);
@@ -685,6 +728,7 @@ function renderPanel(dk, t, side) {
 }
 
 loadAll();
+loadTheme();
 renderJournal();
 document.getElementById('newTicker').focus();
 </script>
