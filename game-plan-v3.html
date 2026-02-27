@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Game Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #16191f;
+    --surface2: #1e2128;
+    --border: #2a2d35;
+    --border-light: #353840;
+    --text: #e2e4e9;
+    --text-dim: #7a7f8e;
+    --text-muted: #4a4f5e;
+    --green: #00c87a;
+    --green-dim: rgba(0,200,122,0.08);
+    --green-mid: #00a362;
+    --red: #ff4d6a;
+    --red-dim: rgba(255,77,106,0.08);
+    --red-mid: #cc3d55;
+    --gold: #f0b429;
+    --accent: #6c7aff;
+    --accent-dim: rgba(108,122,255,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px; font-weight: 600; letter-spacing: -0.5px;
+  }
+  .header-left .subtitle {
+    font-size: 10px; color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-top: 2px; letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .config-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px;
+  }
+  .config-pill label {
+    font-size: 10px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .config-pill input {
+    background: transparent; border: none; color: var(--gold);
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    font-weight: 600; outline: none; text-align: right;
+  }
+  #accountSize { width: 85px; }
+  #riskPct     { width: 45px; }
+
+  /* ── ADD BAR ── */
+  .add-bar {
+    display: flex; gap: 10px; margin-bottom: 24px; align-items: stretch;
+  }
+  .add-bar input[type=text] {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px;
+    font-weight: 600; padding: 8px 14px; width: 130px; outline: none;
+    text-transform: uppercase; letter-spacing: 1px; transition: border-color 0.15s;
+  }
+  .add-bar input[type=text]:focus { border-color: var(--accent); }
+  .add-bar textarea {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text-dim);
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;
+    padding: 8px 14px; flex: 1; outline: none; resize: none;
+    height: 38px; line-height: 22px; transition: border-color 0.15s;
+  }
+  .add-bar textarea:focus { border-color: var(--border-light); }
+  .btn {
+    background: var(--accent); border: none; border-radius: 6px; color: #fff;
+    cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    font-weight: 600; padding: 8px 18px; letter-spacing: 0.5px;
+    transition: opacity 0.15s; white-space: nowrap;
+  }
+  .btn:hover { opacity: 0.82; }
+
+  /* ── DATE GROUP ── */
+  .date-group { margin-bottom: 32px; }
+  .date-group-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; cursor: pointer; user-select: none;
+  }
+  .date-group-header-left { display: flex; align-items: center; gap: 10px; }
+  .date-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
+  }
+  .date-label.today { color: var(--accent); }
+  .date-badge {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--text-muted); padding: 2px 7px;
+  }
+  .collapse-btn {
+    background: transparent; border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-muted); cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    padding: 3px 9px; transition: all 0.15s;
+  }
+  .collapse-btn:hover { border-color: var(--border-light); color: var(--text-dim); }
+  .date-divider { flex: 1; height: 1px; background: var(--border); margin: 0 12px; }
+  .date-group-body.collapsed { display: none; }
+
+  /* ── TICKER CARD ── */
+  .ticker-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 10px; overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .ticker-card:hover { border-color: var(--border-light); }
+
+  /* Top row: symbol + note + fetch btn */
+  .ticker-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 14px; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .ticker-header-left { display: flex; align-items: center; gap: 10px; }
+  .ticker-symbol {
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px;
+    font-weight: 600; letter-spacing: 0.5px;
+  }
+  .ticker-note { font-size: 12px; color: var(--text-dim); font-style: italic; }
+  .ticker-header-right { display: flex; align-items: center; gap: 8px; }
+
+  .fetch-btn {
+    background: var(--accent-dim); border: 1px solid var(--accent);
+    border-radius: 4px; color: var(--accent); cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; padding: 4px 12px; letter-spacing: 0.5px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .fetch-btn:hover { background: var(--accent); color: #fff; }
+  .fetch-btn.loading { opacity: 0.45; pointer-events: none; }
+
+  .btn-remove {
+    background: transparent; border: 1px solid transparent;
+    border-radius: 4px; color: var(--text-muted); cursor: pointer;
+    font-size: 10px; padding: 3px 8px; transition: all 0.15s;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .btn-remove:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: flex; align-items: stretch;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    overflow-x: auto;
+  }
+  .stat-cell {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 7px 10px; border-right: 1px solid var(--border);
+    min-width: 68px; flex-shrink: 0;
+  }
+  .stat-cell:last-child { border-right: none; flex: 1; }
+  .stat-cell-label {
+    font-size: 9px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    font-family: 'IBM Plex Mono', monospace; white-space: nowrap;
+  }
+  .stat-cell input {
+    background: transparent; border: none;
+    border-bottom: 1px solid transparent;
+    color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; font-weight: 500; outline: none;
+    width: 100%; padding: 0; transition: border-color 0.15s, color 0.15s;
+  }
+  .stat-cell input:focus { border-bottom-color: var(--border-light); color: var(--text); }
+  .stat-cell input.pos { color: var(--green); }
+  .stat-cell input.neg { color: var(--red); }
+  .stat-cell input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+  /* ── PANELS ── */
+  .panels { display: grid; grid-template-columns: 1fr 1fr; }
+  .panel { padding: 12px 14px; }
+  .panel-long {
+    border-right: 1px solid var(--border);
+    background: linear-gradient(160deg, var(--green-dim) 0%, transparent 60%);
+  }
+  .panel-short {
+    background: linear-gradient(160deg, var(--red-dim) 0%, transparent 60%);
+  }
+  .panel-title {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .panel-long  .panel-title { color: var(--green); }
+  .panel-short .panel-title { color: var(--red); }
+  .panel-title::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block;
+  }
+  .panel-long  .panel-title::before { background: var(--green); }
+  .panel-short .panel-title::before { background: var(--red); }
+
+  .setup-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text-dim);
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 11px;
+    padding: 4px 8px; outline: none; width: 100%; margin-bottom: 8px;
+  }
+  .setup-input:focus { border-color: var(--border-light); }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field label {
+    font-size: 9px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace;
+  }
+  .field input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    font-weight: 500; padding: 5px 7px; outline: none; width: 100%;
+    transition: border-color 0.15s;
+  }
+  .panel-long  .field input:focus { border-color: var(--green-mid); }
+  .panel-short .field input:focus { border-color: var(--red-mid); }
+
+  /* ── RESULTS ── */
+  .results { border-radius: 5px; padding: 8px 10px; }
+  .panel-long  .results { background: rgba(0,200,122,0.06); border: 1px solid rgba(0,200,122,0.15); }
+  .panel-short .results { background: rgba(255,77,106,0.06); border: 1px solid rgba(255,77,106,0.15); }
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .result-item { display: flex; justify-content: space-between; align-items: center; }
+  .result-label {
+    font-size: 9px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace;
+  }
+  .result-value { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+  .result-value.active-long  { color: var(--green); }
+  .result-value.active-short { color: var(--red); }
+  .ev-display {
+    margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border);
+    text-align: center; font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+  }
+  .ev-display.active-long  { color: var(--green); }
+  .ev-display.active-short { color: var(--red); }
+
+  /* ── EMPTY ── */
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .empty-state .glyph { font-size: 28px; margin-bottom: 10px; opacity: 0.2; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Daily Game Plan</h1>
+    <div class="subtitle">Trade Calculator &amp; Journal</div>
+  </div>
+  <div class="header-right">
+    <div class="config-pill">
+      <label>Account $</label>
+      <input type="number" id="accountSize" value="25500" oninput="saveSettings();recalcAll()">
+    </div>
+    <div class="config-pill">
+      <label>Risk %</label>
+      <input type="number" id="riskPct" value="0.5" step="0.1" oninput="saveSettings();recalcAll()">
+    </div>
+  </div>
+</div>
+
+<div class="add-bar">
+  <input type="text" id="newTicker" placeholder="TICKER" maxlength="8"
+    onkeydown="if(event.key==='Enter')addTicker()">
+  <textarea id="newNote" placeholder="Notes / catalyst / setup context..."
+    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addTicker();}"></textarea>
+  <button class="btn" onclick="addTicker()">+ Add Ticker</button>
+</div>
+
+<div id="journal"></div>
+
+<script>
+const STORAGE_KEY  = 'dgp_journal_v2';
+const SETTINGS_KEY = 'dgp_settings_v1';
+
+let journal  = {};
+let settings = { accountSize: 25500, riskPct: 0.5 };
+let collapsed = {};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatDateLabel(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US',
+    { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+// ── Persistence ──────────────────────────────────────────────────────────────
+function loadAll() {
+  try { const j = localStorage.getItem(STORAGE_KEY); if (j) journal = JSON.parse(j); } catch(e) { journal = {}; }
+  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) settings = JSON.parse(s); } catch(e) {}
+  document.getElementById('accountSize').value = settings.accountSize;
+  document.getElementById('riskPct').value     = settings.riskPct;
+}
+
+function saveJournal()  { localStorage.setItem(STORAGE_KEY,  JSON.stringify(journal));  }
+function saveSettings() {
+  settings.accountSize = parseFloat(document.getElementById('accountSize').value) || 25500;
+  settings.riskPct     = parseFloat(document.getElementById('riskPct').value) || 0.5;
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+// ── Add / Remove ─────────────────────────────────────────────────────────────
+function addTicker() {
+  const sym = document.getElementById('newTicker').value.trim().toUpperCase();
+  if (!sym) return;
+  const note = document.getElementById('newNote').value.trim();
+  const key  = todayKey();
+  if (!journal[key]) journal[key] = { tickers: [] };
+  journal[key].tickers.push({
+    id: Date.now(), sym, note,
+    stats: { price:'', change:'', float:'', atr:'', cvol:'', avgvol:'', relvol:'', short:'', pe:'', margin:'', rsi:'', mktcap:'' },
+    long:  { setup:'', entry:'', exit:'', stop:'' },
+    short: { setup:'', entry:'', exit:'', stop:'' }
+  });
+  saveJournal();
+  document.getElementById('newTicker').value = '';
+  document.getElementById('newNote').value   = '';
+  renderJournal();
+  document.getElementById('newTicker').focus();
+}
+
+function removeTicker(dateKey, id) {
+  if (!journal[dateKey]) return;
+  journal[dateKey].tickers = journal[dateKey].tickers.filter(t => t.id !== id);
+  if (!journal[dateKey].tickers.length) delete journal[dateKey];
+  saveJournal();
+  renderJournal();
+}
+
+// ── Field Updates ─────────────────────────────────────────────────────────────
+function updateField(dateKey, id, side, field, value) {
+  const t = getTicker(dateKey, id);
+  if (!t) return;
+  t[side][field] = value;
+  saveJournal();
+  calcDisplay(dateKey, id, side);
+}
+
+function updateStat(dateKey, id, field, value) {
+  const t = getTicker(dateKey, id);
+  if (!t) return;
+  if (!t.stats) t.stats = {};
+  t.stats[field] = value;
+  saveJournal();
+  // Color the change field
+  if (field === 'change') {
+    const el = document.getElementById(`stat-change-${dateKey}-${id}`);
+    if (el) {
+      const v = parseFloat(value);
+      el.className = isNaN(v) ? '' : (v >= 0 ? 'pos' : 'neg');
+    }
+  }
+}
+
+function getTicker(dateKey, id) {
+  const day = journal[dateKey];
+  if (!day) return null;
+  return day.tickers.find(t => t.id === id) || null;
+}
+
+// ── Fetch Placeholder (connects to Polygon.io when hosted) ───────────────────
+function fetchStats(dateKey, id) {
+  const btn = document.getElementById(`fetch-${dateKey}-${id}`);
+  if (btn) { btn.textContent = '...'; btn.classList.add('loading'); }
+  setTimeout(() => {
+    if (btn) { btn.textContent = 'Fetch'; btn.classList.remove('loading'); }
+    // TODO: wire to Polygon.io API after GitHub Pages deployment
+    // Example endpoint: https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/{sym}?apiKey=KEY
+  }, 600);
+}
+
+// ── Calculation ───────────────────────────────────────────────────────────────
+function calcDisplay(dateKey, id, side) {
+  const t = getTicker(dateKey, id);
+  if (!t) return;
+  const entry = parseFloat(t[side].entry);
+  const exit  = parseFloat(t[side].exit);
+  const stop  = parseFloat(t[side].stop);
+  const acct  = parseFloat(document.getElementById('accountSize').value) || 25500;
+  const rpct  = parseFloat(document.getElementById('riskPct').value) || 0.5;
+  const rDol  = (acct * rpct) / 100;
+  const uid   = `${dateKey}-${id}-${side}`;
+  const cls   = side === 'long' ? 'active-long' : 'active-short';
+
+  const set = (suffix, val, active) => {
+    const el = document.getElementById(`${suffix}-${uid}`);
+    if (!el) return;
+    el.textContent = val;
+    el.className = 'result-value' + (active ? ` ${cls}` : '');
+  };
+  const setEv = (val, active) => {
+    const el = document.getElementById(`ev-${uid}`);
+    if (!el) return;
+    el.textContent = val;
+    el.className = 'ev-display' + (active ? ` ${cls}` : '');
+  };
+
+  if (!entry || !stop || isNaN(entry) || isNaN(stop) || entry === stop) {
+    set('shares','—',false); set('riskdol','—',false);
+    set('risksh','—',false); set('profit','—',false);
+    setEv('R:R —', false); return;
+  }
+
+  const rPerSh  = Math.abs(entry - stop);
+  const shares  = Math.floor(rDol / rPerSh);
+  const rTotal  = (shares * rPerSh).toFixed(2);
+
+  set('shares',  shares.toLocaleString(), true);
+  set('riskdol', '$' + rTotal, true);
+  set('risksh',  '$' + rPerSh.toFixed(2), true);
+
+  if (!isNaN(exit) && exit && exit !== entry) {
+    const pPerSh = Math.abs(exit - entry);
+    set('profit', '$' + (shares * pPerSh).toFixed(2), true);
+    setEv('EV: ' + (pPerSh / rPerSh).toFixed(2) + 'R', true);
+  } else {
+    set('profit','—',false);
+    setEv('R:R —', false);
+  }
+}
+
+function recalcAll() {
+  saveSettings();
+  Object.keys(journal).forEach(dk => {
+    (journal[dk].tickers || []).forEach(t => {
+      calcDisplay(dk, t.id, 'long');
+      calcDisplay(dk, t.id, 'short');
+    });
+  });
+}
+
+// ── Collapse ─────────────────────────────────────────────────────────────────
+function toggleCollapse(dateKey) {
+  collapsed[dateKey] = !collapsed[dateKey];
+  const body = document.getElementById(`group-body-${dateKey}`);
+  const btn  = document.getElementById(`collapse-btn-${dateKey}`);
+  if (body) body.classList.toggle('collapsed', collapsed[dateKey]);
+  if (btn)  btn.textContent = collapsed[dateKey] ? '▸ Show' : '▾ Hide';
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderJournal() {
+  const container = document.getElementById('journal');
+  const keys = Object.keys(journal).sort((a,b) => b.localeCompare(a));
+
+  if (!keys.length) {
+    container.innerHTML = `<div class="empty-state"><div class="glyph">◈</div>Add your first ticker above to begin</div>`;
+    return;
+  }
+
+  const today = todayKey();
+  container.innerHTML = keys.map(dk => {
+    const tickers    = journal[dk].tickers || [];
+    const isToday    = dk === today;
+    const label      = (isToday ? 'Today — ' : '') + formatDateLabel(dk);
+    const isCollapsed = collapsed[dk] || false;
+    const tickerHTML = tickers.length
+      ? tickers.map(t => renderCard(dk, t)).join('')
+      : '<div style="padding:12px 0;color:var(--text-muted);font-size:11px;text-align:center;">No tickers.</div>';
+
+    return `
+    <div class="date-group">
+      <div class="date-group-header" onclick="toggleCollapse('${dk}')">
+        <div class="date-group-header-left">
+          <span class="date-label ${isToday ? 'today' : ''}">${label}</span>
+          <span class="date-badge">${tickers.length} ticker${tickers.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="date-divider"></div>
+        <button class="collapse-btn" id="collapse-btn-${dk}"
+          onclick="event.stopPropagation();toggleCollapse('${dk}')">
+          ${isCollapsed ? '▸ Show' : '▾ Hide'}
+        </button>
+      </div>
+      <div class="date-group-body ${isCollapsed ? 'collapsed' : ''}" id="group-body-${dk}">
+        ${tickerHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  keys.forEach(dk => {
+    (journal[dk].tickers || []).forEach(t => {
+      calcDisplay(dk, t.id, 'long');
+      calcDisplay(dk, t.id, 'short');
+    });
+  });
+}
+
+function renderCard(dk, t) {
+  const s = t.stats || {};
+  const changeCls = (() => { const v = parseFloat(s.change); return isNaN(v) ? '' : (v >= 0 ? 'pos' : 'neg'); })();
+  const uid = (field) => `${dk}-${t.id}-${field}`;
+
+  const statField = (label, field, extraCls, placeholder) => `
+    <div class="stat-cell">
+      <span class="stat-cell-label">${label}</span>
+      <input id="stat-${field === 'change' ? `change-${dk}-${t.id}` : uid(field)}"
+        value="${s[field] || ''}"
+        placeholder="${placeholder || '—'}"
+        class="${field === 'change' ? changeCls : ''}"
+        oninput="updateStat('${dk}',${t.id},'${field}',this.value)">
+    </div>`;
+
+  return `
+  <div class="ticker-card" id="card-${dk}-${t.id}">
+    <div class="ticker-header">
+      <div class="ticker-header-left">
+        <span class="ticker-symbol">${t.sym}</span>
+        <span class="ticker-note">${t.note || ''}</span>
+      </div>
+      <div class="ticker-header-right">
+        <button class="fetch-btn" id="fetch-${dk}-${t.id}"
+          onclick="fetchStats('${dk}',${t.id})">Fetch</button>
+        <button class="btn-remove" onclick="removeTicker('${dk}',${t.id})">✕</button>
+      </div>
+    </div>
+    <div class="stats-row">
+      ${statField('Price',   'price',  '', '0.00')}
+      ${statField('Chg %',   'change', changeCls, '0.00%')}
+      ${statField('Float',   'float',  '', '—')}
+      ${statField('ATR',     'atr',    '', '0.00')}
+      ${statField('Cur Vol', 'cvol',   '', '—')}
+      ${statField('Avg Vol', 'avgvol', '', '—')}
+      ${statField('Rel Vol', 'relvol', '', '—')}
+      ${statField('Short %', 'short',  '', '—')}
+      ${statField('P/E',     'pe',     '', '—')}
+      ${statField('Margin',  'margin', '', '—')}
+      ${statField('RSI',     'rsi',    '', '—')}
+      ${statField('Mkt Cap', 'mktcap', '', '—')}
+    </div>
+    <div class="panels">
+      ${renderPanel(dk, t, 'long')}
+      ${renderPanel(dk, t, 'short')}
+    </div>
+  </div>`;
+}
+
+function renderPanel(dk, t, side) {
+  const cls   = side === 'long' ? 'panel-long' : 'panel-short';
+  const label = side === 'long' ? 'LONG' : 'SHORT';
+  const uid   = `${dk}-${t.id}-${side}`;
+  const data  = t[side];
+  return `
+  <div class="panel ${cls}">
+    <div class="panel-title">${label}</div>
+    <input class="setup-input" value="${data.setup || ''}" placeholder="Setup / notes..."
+      oninput="updateField('${dk}',${t.id},'${side}','setup',this.value)">
+    <div class="field-row">
+      <div class="field"><label>Entry</label>
+        <input type="number" value="${data.entry || ''}" placeholder="0.00" step="0.01"
+          oninput="updateField('${dk}',${t.id},'${side}','entry',this.value)"></div>
+      <div class="field"><label>Target</label>
+        <input type="number" value="${data.exit || ''}" placeholder="0.00" step="0.01"
+          oninput="updateField('${dk}',${t.id},'${side}','exit',this.value)"></div>
+      <div class="field"><label>Stop</label>
+        <input type="number" value="${data.stop || ''}" placeholder="0.00" step="0.01"
+          oninput="updateField('${dk}',${t.id},'${side}','stop',this.value)"></div>
+    </div>
+    <div class="results">
+      <div class="results-grid">
+        <div class="result-item">
+          <span class="result-label">Shares</span>
+          <span class="result-value" id="shares-${uid}">—</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Risk $</span>
+          <span class="result-value" id="riskdol-${uid}">—</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Risk/sh</span>
+          <span class="result-value" id="risksh-${uid}">—</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Profit</span>
+          <span class="result-value" id="profit-${uid}">—</span>
+        </div>
+      </div>
+      <div class="ev-display" id="ev-${uid}">R:R —</div>
+    </div>
+  </div>`;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+loadAll();
+renderJournal();
+document.getElementById('newTicker').focus();
+</script>
+</body>
+</html>
