@@ -37,7 +37,6 @@
     padding: 20px;
   }
 
-  /* ── HEADER ── */
   .header {
     display: flex;
     justify-content: space-between;
@@ -75,7 +74,6 @@
   #accountSize { width: 85px; }
   #riskPct     { width: 45px; }
 
-  /* ── ADD BAR ── */
   .add-bar {
     display: flex; gap: 10px; margin-bottom: 24px; align-items: stretch;
   }
@@ -103,7 +101,6 @@
   }
   .btn:hover { opacity: 0.82; }
 
-  /* ── DATE GROUP ── */
   .date-group { margin-bottom: 32px; }
   .date-group-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -130,7 +127,6 @@
   .date-divider { flex: 1; height: 1px; background: var(--border); margin: 0 12px; }
   .date-group-body.collapsed { display: none; }
 
-  /* ── TICKER CARD ── */
   .ticker-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; margin-bottom: 10px; overflow: hidden;
@@ -138,7 +134,6 @@
   }
   .ticker-card:hover { border-color: var(--border-light); }
 
-  /* Top row: symbol + note + fetch btn */
   .ticker-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 9px 14px; border-bottom: 1px solid var(--border);
@@ -170,7 +165,6 @@
   }
   .btn-remove:hover { border-color: var(--red); color: var(--red); }
 
-  /* ── STATS ROW ── */
   .stats-row {
     display: flex; align-items: stretch;
     border-bottom: 1px solid var(--border);
@@ -200,7 +194,6 @@
   .stat-cell input.neg { color: var(--red); }
   .stat-cell input::placeholder { color: var(--text-muted); opacity: 0.6; }
 
-  /* ── PANELS ── */
   .panels { display: grid; grid-template-columns: 1fr 1fr; }
   .panel { padding: 12px 14px; }
   .panel-long {
@@ -247,7 +240,6 @@
   .panel-long  .field input:focus { border-color: var(--green-mid); }
   .panel-short .field input:focus { border-color: var(--red-mid); }
 
-  /* ── RESULTS ── */
   .results { border-radius: 5px; padding: 8px 10px; }
   .panel-long  .results { background: rgba(0,200,122,0.06); border: 1px solid rgba(0,200,122,0.15); }
   .panel-short .results { background: rgba(255,77,106,0.06); border: 1px solid rgba(255,77,106,0.15); }
@@ -268,7 +260,6 @@
   .ev-display.active-long  { color: var(--green); }
   .ev-display.active-short { color: var(--red); }
 
-  /* ── EMPTY ── */
   .empty-state {
     text-align: center; padding: 60px 20px; color: var(--text-muted);
     font-family: 'IBM Plex Mono', monospace; font-size: 11px;
@@ -318,7 +309,6 @@ let journal  = {};
 let settings = { accountSize: 25500, riskPct: 0.5 };
 let collapsed = {};
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -329,7 +319,6 @@ function formatDateLabel(key) {
     { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-// ── Persistence ──────────────────────────────────────────────────────────────
 function loadAll() {
   try { const j = localStorage.getItem(STORAGE_KEY); if (j) journal = JSON.parse(j); } catch(e) { journal = {}; }
   try { const s = localStorage.getItem(SETTINGS_KEY); if (s) settings = JSON.parse(s); } catch(e) {}
@@ -344,7 +333,6 @@ function saveSettings() {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
-// ── Add / Remove ─────────────────────────────────────────────────────────────
 function addTicker() {
   const sym = document.getElementById('newTicker').value.trim().toUpperCase();
   if (!sym) return;
@@ -372,7 +360,6 @@ function removeTicker(dateKey, id) {
   renderJournal();
 }
 
-// ── Field Updates ─────────────────────────────────────────────────────────────
 function updateField(dateKey, id, side, field, value) {
   const t = getTicker(dateKey, id);
   if (!t) return;
@@ -387,7 +374,6 @@ function updateStat(dateKey, id, field, value) {
   if (!t.stats) t.stats = {};
   t.stats[field] = value;
   saveJournal();
-  // Color the change field
   if (field === 'change') {
     const el = document.getElementById(`stat-change-${dateKey}-${id}`);
     if (el) {
@@ -403,18 +389,84 @@ function getTicker(dateKey, id) {
   return day.tickers.find(t => t.id === id) || null;
 }
 
-// ── Fetch Placeholder (connects to Polygon.io when hosted) ───────────────────
-function fetchStats(dateKey, id) {
+const POLYGON_KEY = '2UzhPEeHv7rRDqYbeg0ocy2XBA2hwUFN';
+
+async function fetchStats(dateKey, id) {
+  const t = getTicker(dateKey, id);
+  if (!t) return;
   const btn = document.getElementById(`fetch-${dateKey}-${id}`);
   if (btn) { btn.textContent = '...'; btn.classList.add('loading'); }
-  setTimeout(() => {
-    if (btn) { btn.textContent = 'Fetch'; btn.classList.remove('loading'); }
-    // TODO: wire to Polygon.io API after GitHub Pages deployment
-    // Example endpoint: https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/{sym}?apiKey=KEY
-  }, 600);
+
+  try {
+    const snapRes   = await fetch(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
+    const snapData  = await snapRes.json();
+    const snap      = snapData?.ticker;
+
+    const detailRes  = await fetch(`https://api.polygon.io/v3/reference/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
+    const detailData = await detailRes.json();
+    const detail     = detailData?.results;
+
+    if (snap) {
+      const day    = snap.day || {};
+      const prevDay = snap.prevDay || {};
+      const change = snap.todaysChangePerc;
+      const price  = day.c || snap.lastTrade?.p || '';
+      const cvol   = day.v ? formatVol(day.v) : '';
+      const relvol = (day.v && prevDay.v) ? (day.v / prevDay.v).toFixed(2) : '';
+
+      const aggRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?apiKey=${POLYGON_KEY}`);
+      const aggData = await aggRes.json();
+      const prevVol = aggData?.results?.[0]?.v;
+
+      if (!t.stats) t.stats = {};
+      t.stats.price  = price ? price.toFixed(2) : t.stats.price;
+      t.stats.change = change !== undefined ? change.toFixed(2) : t.stats.change;
+      t.stats.cvol   = cvol || t.stats.cvol;
+      t.stats.relvol = relvol || t.stats.relvol;
+      t.stats.avgvol = prevVol ? formatVol(prevVol) : t.stats.avgvol;
+    }
+
+    if (detail) {
+      const float  = detail.share_class_shares_outstanding;
+      const mktcap = detail.market_cap;
+      if (float)  t.stats.float  = formatVol(float);
+      if (mktcap) t.stats.mktcap = formatMktCap(mktcap);
+    }
+
+    const rsiRes  = await fetch(`https://api.polygon.io/v1/indicators/rsi/${t.sym}?timespan=day&window=14&series_type=close&limit=1&apiKey=${POLYGON_KEY}`);
+    const rsiData = await rsiRes.json();
+    const rsiVal  = rsiData?.results?.values?.[0]?.value;
+    if (rsiVal) t.stats.rsi = rsiVal.toFixed(1);
+
+    saveJournal();
+    renderJournal();
+
+  } catch(e) {
+    console.error('Fetch error:', e);
+    if (btn) btn.textContent = 'Error';
+    setTimeout(() => { if (btn) { btn.textContent = 'Fetch'; btn.classList.remove('loading'); } }, 1500);
+    return;
+  }
+
+  if (btn) { btn.textContent = 'Fetch'; btn.classList.remove('loading'); }
 }
 
-// ── Calculation ───────────────────────────────────────────────────────────────
+function formatVol(n) {
+  if (!n) return '—';
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+  return n.toString();
+}
+
+function formatMktCap(n) {
+  if (!n) return '—';
+  if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+  if (n >= 1e9)  return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6)  return (n / 1e6).toFixed(0) + 'M';
+  return n.toString();
+}
+
 function calcDisplay(dateKey, id, side) {
   const t = getTicker(dateKey, id);
   if (!t) return;
@@ -446,9 +498,9 @@ function calcDisplay(dateKey, id, side) {
     setEv('R:R —', false); return;
   }
 
-  const rPerSh  = Math.abs(entry - stop);
-  const shares  = Math.floor(rDol / rPerSh);
-  const rTotal  = (shares * rPerSh).toFixed(2);
+  const rPerSh = Math.abs(entry - stop);
+  const shares = Math.floor(rDol / rPerSh);
+  const rTotal = (shares * rPerSh).toFixed(2);
 
   set('shares',  shares.toLocaleString(), true);
   set('riskdol', '$' + rTotal, true);
@@ -474,7 +526,6 @@ function recalcAll() {
   });
 }
 
-// ── Collapse ─────────────────────────────────────────────────────────────────
 function toggleCollapse(dateKey) {
   collapsed[dateKey] = !collapsed[dateKey];
   const body = document.getElementById(`group-body-${dateKey}`);
@@ -483,7 +534,6 @@ function toggleCollapse(dateKey) {
   if (btn)  btn.textContent = collapsed[dateKey] ? '▸ Show' : '▾ Hide';
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
 function renderJournal() {
   const container = document.getElementById('journal');
   const keys = Object.keys(journal).sort((a,b) => b.localeCompare(a));
@@ -495,11 +545,11 @@ function renderJournal() {
 
   const today = todayKey();
   container.innerHTML = keys.map(dk => {
-    const tickers    = journal[dk].tickers || [];
-    const isToday    = dk === today;
-    const label      = (isToday ? 'Today — ' : '') + formatDateLabel(dk);
+    const tickers     = journal[dk].tickers || [];
+    const isToday     = dk === today;
+    const label       = (isToday ? 'Today — ' : '') + formatDateLabel(dk);
     const isCollapsed = collapsed[dk] || false;
-    const tickerHTML = tickers.length
+    const tickerHTML  = tickers.length
       ? tickers.map(t => renderCard(dk, t)).join('')
       : '<div style="padding:12px 0;color:var(--text-muted);font-size:11px;text-align:center;">No tickers.</div>';
 
@@ -533,12 +583,11 @@ function renderJournal() {
 function renderCard(dk, t) {
   const s = t.stats || {};
   const changeCls = (() => { const v = parseFloat(s.change); return isNaN(v) ? '' : (v >= 0 ? 'pos' : 'neg'); })();
-  const uid = (field) => `${dk}-${t.id}-${field}`;
 
-  const statField = (label, field, extraCls, placeholder) => `
+  const statField = (label, field, placeholder) => `
     <div class="stat-cell">
       <span class="stat-cell-label">${label}</span>
-      <input id="stat-${field === 'change' ? `change-${dk}-${t.id}` : uid(field)}"
+      <input id="stat-${field === 'change' ? `change-${dk}-${t.id}` : `${dk}-${t.id}-${field}`}"
         value="${s[field] || ''}"
         placeholder="${placeholder || '—'}"
         class="${field === 'change' ? changeCls : ''}"
@@ -559,18 +608,18 @@ function renderCard(dk, t) {
       </div>
     </div>
     <div class="stats-row">
-      ${statField('Price',   'price',  '', '0.00')}
-      ${statField('Chg %',   'change', changeCls, '0.00%')}
-      ${statField('Float',   'float',  '', '—')}
-      ${statField('ATR',     'atr',    '', '0.00')}
-      ${statField('Cur Vol', 'cvol',   '', '—')}
-      ${statField('Avg Vol', 'avgvol', '', '—')}
-      ${statField('Rel Vol', 'relvol', '', '—')}
-      ${statField('Short %', 'short',  '', '—')}
-      ${statField('P/E',     'pe',     '', '—')}
-      ${statField('Margin',  'margin', '', '—')}
-      ${statField('RSI',     'rsi',    '', '—')}
-      ${statField('Mkt Cap', 'mktcap', '', '—')}
+      ${statField('Price',   'price',  '0.00')}
+      ${statField('Chg %',   'change', '0.00%')}
+      ${statField('Float',   'float',  '—')}
+      ${statField('ATR',     'atr',    '0.00')}
+      ${statField('Cur Vol', 'cvol',   '—')}
+      ${statField('Avg Vol', 'avgvol', '—')}
+      ${statField('Rel Vol', 'relvol', '—')}
+      ${statField('Short %', 'short',  '—')}
+      ${statField('P/E',     'pe',     '—')}
+      ${statField('Margin',  'margin', '—')}
+      ${statField('RSI',     'rsi',    '—')}
+      ${statField('Mkt Cap', 'mktcap', '—')}
     </div>
     <div class="panels">
       ${renderPanel(dk, t, 'long')}
@@ -624,7 +673,6 @@ function renderPanel(dk, t, side) {
   </div>`;
 }
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
 loadAll();
 renderJournal();
 document.getElementById('newTicker').focus();
