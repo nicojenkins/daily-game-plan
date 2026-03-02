@@ -334,7 +334,7 @@
       <label>Risk %</label>
       <input type="number" id="riskPct" value="0.5" step="0.1" oninput="saveSettings();recalcAll()">
     </div>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">â Light</button>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Light</button>
   </div>
 </div>
 
@@ -362,7 +362,7 @@ let collapsed = {};
 
 function toggleTheme() {
   const isLight = document.body.classList.toggle('light');
-  document.getElementById('themeToggle').textContent = isLight ? 'ð Dark' : 'â Light';
+  document.getElementById('themeToggle').textContent = isLight ? '🌙 Dark' : '☀ Light';
   localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
 }
 
@@ -370,7 +370,7 @@ function loadTheme() {
   const saved = localStorage.getItem(THEME_KEY);
   if (saved === 'light') {
     document.body.classList.add('light');
-    document.getElementById('themeToggle').textContent = 'ð Dark';
+    document.getElementById('themeToggle').textContent = '🌙 Dark';
   }
 }
 
@@ -523,7 +523,7 @@ async function fetchStats(dateKey, id) {
 }
 
 function formatVol(n) {
-  if (!n) return 'â';
+  if (!n) return '—';
   if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
   if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
   if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
@@ -531,7 +531,7 @@ function formatVol(n) {
 }
 
 function formatMktCap(n) {
-  if (!n) return 'â';
+  if (!n) return '—';
   if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
   if (n >= 1e9)  return (n / 1e9).toFixed(1) + 'B';
   if (n >= 1e6)  return (n / 1e6).toFixed(0) + 'M';
@@ -564,9 +564,9 @@ function calcDisplay(dateKey, id, side) {
   };
 
   if (!entry || !stop || isNaN(entry) || isNaN(stop) || entry === stop) {
-    set('shares','â',false); set('riskdol','â',false);
-    set('risksh','â',false); set('profit','â',false);
-    setEv('R:R â', false); return;
+    set('shares','—',false); set('riskdol','—',false);
+    set('risksh','—',false); set('profit','—',false);
+    setEv('R:R —', false); return;
   }
 
   const rPerSh = Math.abs(entry - stop);
@@ -582,8 +582,8 @@ function calcDisplay(dateKey, id, side) {
     set('profit', '$' + (shares * pPerSh).toFixed(2), true);
     setEv('EV: ' + (pPerSh / rPerSh).toFixed(2) + 'R', true);
   } else {
-    set('profit','â',false);
-    setEv('R:R â', false);
+    set('profit','—',false);
+    setEv('R:R —', false);
   }
 }
 
@@ -602,7 +602,7 @@ function toggleCollapse(dateKey) {
   const body = document.getElementById(`group-body-${dateKey}`);
   const btn  = document.getElementById(`collapse-btn-${dateKey}`);
   if (body) body.classList.toggle('collapsed', collapsed[dateKey]);
-  if (btn)  btn.textContent = collapsed[dateKey] ? 'â¸ Show' : 'â¾ Hide';
+  if (btn)  btn.textContent = collapsed[dateKey] ? '▸ Show' : '▾ Hide';
 }
 
 function renderJournal() {
@@ -610,7 +610,7 @@ function renderJournal() {
   const keys = Object.keys(journal).sort((a,b) => b.localeCompare(a));
 
   if (!keys.length) {
-    container.innerHTML = `<div class="empty-state"><div class="glyph">â</div>Add your first ticker above to begin</div>`;
+    container.innerHTML = `<div class="empty-state"><div class="glyph">◈</div>Add your first ticker above to begin</div>`;
     return;
   }
 
@@ -618,7 +618,7 @@ function renderJournal() {
   container.innerHTML = keys.map(dk => {
     const tickers     = journal[dk].tickers || [];
     const isToday     = dk === today;
-    const label       = (isToday ? 'Today â ' : '') + formatDateLabel(dk);
+    const label       = (isToday ? 'Today — ' : '') + formatDateLabel(dk);
     const isCollapsed = collapsed[dk] || false;
     const tickerHTML  = tickers.length
       ? [...tickers].reverse().map(t => renderCard(dk, t)).join('')
@@ -634,7 +634,7 @@ function renderJournal() {
         <div class="date-divider"></div>
         <button class="collapse-btn" id="collapse-btn-${dk}"
           onclick="event.stopPropagation();toggleCollapse('${dk}')">
-          ${isCollapsed ? 'â¸ Show' : 'â¾ Hide'}
+          ${isCollapsed ? '▸ Show' : '▾ Hide'}
         </button>
       </div>
       <div class="date-group-body ${isCollapsed ? 'collapsed' : ''}" id="group-body-${dk}">
@@ -660,7 +660,7 @@ function renderCard(dk, t) {
       <span class="stat-cell-label">${label}</span>
       <input id="stat-${field === 'change' ? `change-${dk}-${t.id}` : `${dk}-${t.id}-${field}`}"
         value="${s[field] || ''}"
-        placeholder="${placeholder || 'â'}"
+        placeholder="${placeholder || '—'}"
         class="${field === 'change' ? changeCls : ''}"
         oninput="updateStat('${dk}',${t.id},'${field}',this.value)">
     </div>`;
@@ -683,16 +683,16 @@ function renderCard(dk, t) {
       <div class="stats-grid">
         ${statField('Price',   'price',  '0.00')}
         ${statField('Chg %',   'change', '0.00%')}
-        ${statField('Float',   'float',  'â')}
+        ${statField('Float',   'float',  '—')}
         ${statField('ATR',     'atr',    '0.00')}
-        ${statField('Cur Vol', 'cvol',   'â')}
-        ${statField('Avg Vol', 'avgvol', 'â')}
-        ${statField('Rel Vol', 'relvol', 'â')}
-        ${statField('Short %', 'short',  'â')}
-        ${statField('P/E',     'pe',     'â')}
-        ${statField('Margin',  'margin', 'â')}
-        ${statField('RSI',     'rsi',    'â')}
-        ${statField('Mkt Cap', 'mktcap', 'â')}
+        ${statField('Cur Vol', 'cvol',   '—')}
+        ${statField('Avg Vol', 'avgvol', '—')}
+        ${statField('Rel Vol', 'relvol', '—')}
+        ${statField('Short %', 'short',  '—')}
+        ${statField('P/E',     'pe',     '—')}
+        ${statField('Margin',  'margin', '—')}
+        ${statField('RSI',     'rsi',    '—')}
+        ${statField('Mkt Cap', 'mktcap', '—')}
       </div>
     </div>
     <div class="panels">
@@ -727,22 +727,22 @@ function renderPanel(dk, t, side) {
       <div class="results-grid">
         <div class="result-item">
           <span class="result-label">Shares</span>
-          <span class="result-value" id="shares-${uid}">â</span>
+          <span class="result-value" id="shares-${uid}">—</span>
         </div>
         <div class="result-item">
           <span class="result-label">Risk $</span>
-          <span class="result-value" id="riskdol-${uid}">â</span>
+          <span class="result-value" id="riskdol-${uid}">—</span>
         </div>
         <div class="result-item">
           <span class="result-label">Risk/sh</span>
-          <span class="result-value" id="risksh-${uid}">â</span>
+          <span class="result-value" id="risksh-${uid}">—</span>
         </div>
         <div class="result-item">
           <span class="result-label">Profit</span>
-          <span class="result-value" id="profit-${uid}">â</span>
+          <span class="result-value" id="profit-${uid}">—</span>
         </div>
       </div>
-      <div class="ev-display" id="ev-${uid}">R:R â</div>
+      <div class="ev-display" id="ev-${uid}">R:R —</div>
     </div>
   </div>`;
 }
