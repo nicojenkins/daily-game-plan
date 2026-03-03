@@ -82,7 +82,6 @@
   .stat-cell input:focus { border-bottom-color: var(--border-light); color: var(--text); }
   .stat-cell input.pos { color: var(--green); } .stat-cell input.neg { color: var(--red); }
   .stat-cell input::placeholder { color: var(--text-muted); opacity: 0.6; }
-  /* GRADE PANEL */
   .grade-panel { border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
   .grade-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; background: var(--surface); border-bottom: 1px solid var(--border); }
   .grade-panel-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
@@ -196,36 +195,32 @@ function updateField(dk,id,side,field,value){const t=getTicker(dk,id);if(!t)retu
 function updateStat(dk,id,field,value){const t=getTicker(dk,id);if(!t)return;if(!t.stats)t.stats={};t.stats[field]=value;saveJournal();if(field==='change'){const el=document.getElementById(`stat-change-${dk}-${id}`);if(el){const v=parseFloat(value);el.className=isNaN(v)?'':(v>=0?'pos':'neg');}}}
 function getTicker(dk,id){const day=journal[dk];if(!day)return null;return day.tickers.find(t=>t.id===id)||null;}
 
-// KEY FIX: resolve risk dollars per ticker — grade overrides global if set
+// Returns risk dollars for THIS ticker only — never touches the header
 function getRiskDol(t){
-  if(t.grade && GRADES[t.grade]){
-    return GRADES[t.grade].riskDol;
-  }
+  if(t.grade && GRADES[t.grade]) return GRADES[t.grade].riskDol;
   const acct=parseFloat(document.getElementById('accountSize').value)||25500;
   const rpct=parseFloat(document.getElementById('riskPct').value)||0.5;
   return (acct*rpct)/100;
 }
 
+// Grade selection: only updates this ticker, never touches header or other cards
 function setGrade(dk,id,grade){
-  const t=getTicker(dk,id);if(!t)return;
+  const t=getTicker(dk,id);
+  if(!t)return;
   t.grade=(t.grade===grade)?null:grade;
   saveJournal();
   updateGradeDisplay(dk,id,t.grade);
-  // Update header to reflect this ticker's grade (for reference), but only recalc this ticker
-  const acct=parseFloat(document.getElementById('accountSize').value)||25500;
-  if(t.grade && GRADES[t.grade]){
-    const newPct=((GRADES[t.grade].riskDol/acct)*100).toFixed(2);
-    document.getElementById('riskPct').value=newPct;
-    saveSettings();
-  }
-  // Only recalc THIS ticker, not all
   calcDisplay(dk,id,'long');
   calcDisplay(dk,id,'short');
 }
 
 function updateGradeDisplay(dk,id,grade){
-  const g=GRADES[grade];const prefix=`grade-${dk}-${id}`;
-  Object.keys(GRADES).forEach(k=>{const b=document.getElementById(`${prefix}-btn-${k}`);if(b)b.classList.toggle('active',k===grade);});
+  const g=GRADES[grade];
+  const prefix=`grade-${dk}-${id}`;
+  Object.keys(GRADES).forEach(k=>{
+    const b=document.getElementById(`${prefix}-btn-${k}`);
+    if(b)b.classList.toggle('active',k===grade);
+  });
   const descEl=document.getElementById(`${prefix}-desc`);
   const riskEl=document.getElementById(`${prefix}-risk`);
   const dispEl=document.getElementById(`${prefix}-display`);
@@ -271,8 +266,7 @@ function formatMktCap(n){if(!n)return'—';if(n>=1e12)return(n/1e12).toFixed(2)+
 function calcDisplay(dk,id,side){
   const t=getTicker(dk,id);if(!t)return;
   const entry=parseFloat(t[side].entry),exit=parseFloat(t[side].exit),stop=parseFloat(t[side].stop);
-  // Use per-ticker risk dollar (grade-aware)
-  const rDol=getRiskDol(t);
+  const rDol=getRiskDol(t); // per-ticker, isolated
   const uid=`${dk}-${id}-${side}`;const cls=side==='long'?'active-long':'active-short';
   const set=(s,v,a)=>{const el=document.getElementById(`${s}-${uid}`);if(!el)return;el.textContent=v;el.className='result-value'+(a?` ${cls}`:'');};
   const setEv=(v,a)=>{const el=document.getElementById(`ev-${uid}`);if(!el)return;el.textContent=v;el.className='ev-display'+(a?` ${cls}`:'');};
@@ -283,6 +277,7 @@ function calcDisplay(dk,id,side){
   else{set('profit','—',false);setEv('R:R —',false);}
 }
 
+// recalcAll only fires when account size or risk % header is manually changed
 function recalcAll(){
   saveSettings();
   Object.keys(journal).forEach(dk=>{
