@@ -7,319 +7,136 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1117;
-    --surface: #16191f;
-    --surface2: #1e2128;
-    --border: #2a2d35;
-    --border-light: #353840;
-    --text: #e2e4e9;
-    --text-dim: #7a7f8e;
-    --text-muted: #4a4f5e;
-    --green: #00c87a;
-    --green-dim: rgba(0,200,122,0.08);
-    --green-mid: #00a362;
-    --red: #ff4d6a;
-    --red-dim: rgba(255,77,106,0.08);
-    --red-mid: #cc3d55;
-    --gold: #f0b429;
-    --accent: #6c7aff;
-    --accent-dim: rgba(108,122,255,0.12);
+    --bg: #0f1117; --surface: #16191f; --surface2: #1e2128;
+    --border: #2a2d35; --border-light: #353840;
+    --text: #e2e4e9; --text-dim: #7a7f8e; --text-muted: #4a4f5e;
+    --green: #00c87a; --green-dim: rgba(0,200,122,0.08); --green-mid: #00a362;
+    --red: #ff4d6a; --red-dim: rgba(255,77,106,0.08); --red-mid: #cc3d55;
+    --gold: #f0b429; --accent: #6c7aff; --accent-dim: rgba(108,122,255,0.12);
+    --grade-ap: #c8f5a0; --grade-ap-dim: rgba(200,245,160,0.10);
+    --grade-a: #7dd3fc;  --grade-a-dim: rgba(125,211,252,0.10);
+    --grade-b: #fbbf24;  --grade-b-dim: rgba(251,191,36,0.10);
+    --grade-c: #94a3b8;  --grade-c-dim: rgba(148,163,184,0.08);
   }
-
   body.light {
-    --bg: #f4f5f7;
-    --surface: #ffffff;
-    --surface2: #eef0f3;
-    --border: #d4d7de;
-    --border-light: #b8bcc8;
-    --text: #1a1d26;
-    --text-dim: #4a5068;
-    --text-muted: #9196a8;
-    --green: #007a4a;
-    --green-dim: rgba(0,122,74,0.07);
-    --green-mid: #005e38;
-    --red: #c0001f;
-    --red-dim: rgba(192,0,31,0.07);
-    --red-mid: #9a0019;
-    --gold: #b07d00;
-    --accent: #3d4fd6;
-    --accent-dim: rgba(61,79,214,0.10);
+    --bg: #f4f5f7; --surface: #ffffff; --surface2: #eef0f3;
+    --border: #d4d7de; --border-light: #b8bcc8;
+    --text: #1a1d26; --text-dim: #4a5068; --text-muted: #9196a8;
+    --green: #007a4a; --green-dim: rgba(0,122,74,0.07); --green-mid: #005e38;
+    --red: #c0001f; --red-dim: rgba(192,0,31,0.07); --red-mid: #9a0019;
+    --gold: #b07d00; --accent: #3d4fd6; --accent-dim: rgba(61,79,214,0.10);
+    --grade-ap: #4a7c20; --grade-ap-dim: rgba(74,124,32,0.08);
+    --grade-a: #1e6fa8;  --grade-a-dim: rgba(30,111,168,0.08);
+    --grade-b: #92600a;  --grade-b-dim: rgba(146,96,10,0.08);
+    --grade-c: #5a6272;  --grade-c-dim: rgba(90,98,114,0.06);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13px;
-    min-height: 100vh;
-    padding: 20px;
-    transition: background 0.2s, color 0.2s;
-  }
-
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; min-height: 100vh; padding: 20px; transition: background 0.2s, color 0.2s; }
   .page-wrap { max-width: 1200px; margin: 0 auto; }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .header-left h1 {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 18px; font-weight: 600; letter-spacing: -0.5px;
-  }
-  .header-left .subtitle {
-    font-size: 10px; color: var(--text-muted);
-    font-family: 'IBM Plex Mono', monospace;
-    margin-top: 2px; letter-spacing: 1.5px; text-transform: uppercase;
-  }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
+  .header-left h1 { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+  .header-left .subtitle { font-size: 10px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; letter-spacing: 1.5px; text-transform: uppercase; }
   .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .config-pill {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 6px; padding: 6px 12px;
-  }
-  .config-pill label {
-    font-size: 10px; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
-  }
-  .config-pill input {
-    background: transparent; border: none; color: var(--gold);
-    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
-    font-weight: 600; outline: none; text-align: right;
-  }
-  #accountSize { width: 85px; }
-  #riskPct     { width: 45px; }
-
-  .theme-toggle {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text-dim); cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-    padding: 6px 12px; transition: all 0.15s; white-space: nowrap;
-  }
+  .config-pill { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; }
+  .config-pill label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  .config-pill input { background: transparent; border: none; color: var(--gold); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; outline: none; text-align: right; }
+  #accountSize { width: 85px; } #riskPct { width: 45px; }
+  .theme-toggle { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 6px 12px; transition: all 0.15s; white-space: nowrap; }
   .theme-toggle:hover { border-color: var(--border-light); color: var(--text); }
-
-  .add-bar {
-    display: flex; gap: 10px; margin-bottom: 24px; align-items: stretch;
-  }
-  .add-bar input[type=text] {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text);
-    font-family: 'IBM Plex Mono', monospace; font-size: 14px;
-    font-weight: 600; padding: 8px 14px; width: 130px; outline: none;
-    text-transform: uppercase; letter-spacing: 1px; transition: border-color 0.15s;
-  }
+  .add-bar { display: flex; gap: 10px; margin-bottom: 24px; align-items: stretch; }
+  .add-bar input[type=text] { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; padding: 8px 14px; width: 130px; outline: none; text-transform: uppercase; letter-spacing: 1px; transition: border-color 0.15s; }
   .add-bar input[type=text]:focus { border-color: var(--accent); }
-  .add-bar textarea {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text-dim);
-    font-family: 'IBM Plex Sans', sans-serif; font-size: 12px;
-    padding: 8px 14px; flex: 1; outline: none; resize: none;
-    height: 38px; line-height: 22px; transition: border-color 0.15s;
-  }
+  .add-bar textarea { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; padding: 8px 14px; flex: 1; outline: none; resize: none; height: 38px; line-height: 22px; transition: border-color 0.15s; }
   .add-bar textarea:focus { border-color: var(--border-light); }
-  .btn {
-    background: var(--accent); border: none; border-radius: 6px; color: #fff;
-    cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-    font-weight: 600; padding: 8px 18px; letter-spacing: 0.5px;
-    transition: opacity 0.15s; white-space: nowrap;
-  }
+  .btn { background: var(--accent); border: none; border-radius: 6px; color: #fff; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 18px; letter-spacing: 0.5px; transition: opacity 0.15s; white-space: nowrap; }
   .btn:hover { opacity: 0.82; }
-
   .date-group { margin-bottom: 32px; }
-  .date-group-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 12px; cursor: pointer; user-select: none;
-  }
+  .date-group-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; cursor: pointer; user-select: none; }
   .date-group-header-left { display: flex; align-items: center; gap: 10px; }
-  .date-label {
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
-  }
+  .date-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); }
   .date-label.today { color: var(--accent); }
-  .date-badge {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 4px; font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px; color: var(--text-muted); padding: 2px 7px;
-  }
-  .collapse-btn {
-    background: transparent; border: 1px solid var(--border); border-radius: 4px;
-    color: var(--text-muted); cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    padding: 3px 9px; transition: all 0.15s;
-  }
+  .date-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); padding: 2px 7px; }
+  .collapse-btn { background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; transition: all 0.15s; }
   .collapse-btn:hover { border-color: var(--border-light); color: var(--text-dim); }
   .date-divider { flex: 1; height: 1px; background: var(--border); margin: 0 12px; }
   .date-group-body.collapsed { display: none; }
-
-  .ticker-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; margin-bottom: 10px; overflow: hidden;
-    display: grid; grid-template-columns: 260px 1fr 1fr;
-    transition: border-color 0.15s;
-  }
+  .ticker-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; display: grid; grid-template-columns: 260px 1fr 1fr; transition: border-color 0.15s; }
   .ticker-card:hover { border-color: var(--border-light); }
-
-  .card-left {
-    background: var(--surface2); border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; padding: 12px 14px; gap: 10px;
-  }
-  .card-left-top {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
-  }
+  .card-left { background: var(--surface2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 12px 14px; gap: 10px; }
+  .card-left-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .card-left-title { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  .ticker-symbol {
-    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
-    font-weight: 700; letter-spacing: 0.5px;
-  }
-  .ticker-note {
-    font-size: 11px; color: var(--text-dim); font-style: italic;
-    word-break: break-word; line-height: 1.4;
-  }
+  .ticker-symbol { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; }
+  .ticker-note { font-size: 11px; color: var(--text-dim); font-style: italic; word-break: break-word; line-height: 1.4; }
   .card-left-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
-
-  .fetch-btn {
-    background: var(--accent-dim); border: 1px solid var(--accent);
-    border-radius: 4px; color: var(--accent); cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-    font-weight: 600; padding: 4px 10px; letter-spacing: 0.5px;
-    transition: all 0.15s; white-space: nowrap;
-  }
+  .fetch-btn { background: var(--accent-dim); border: 1px solid var(--accent); border-radius: 4px; color: var(--accent); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 4px 10px; letter-spacing: 0.5px; transition: all 0.15s; white-space: nowrap; }
   .fetch-btn:hover { background: var(--accent); color: #fff; }
   .fetch-btn.loading { opacity: 0.45; pointer-events: none; }
-
-  .btn-remove {
-    background: transparent; border: 1px solid transparent;
-    border-radius: 4px; color: var(--text-muted); cursor: pointer;
-    font-size: 10px; padding: 3px 6px; transition: all 0.15s;
-    font-family: 'IBM Plex Mono', monospace; text-align: center;
-  }
+  .btn-remove { background: transparent; border: 1px solid transparent; border-radius: 4px; color: var(--text-muted); cursor: pointer; font-size: 10px; padding: 3px 6px; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; text-align: center; }
   .btn-remove:hover { border-color: var(--red); color: var(--red); }
-
-  .refresh-btn {
-    background: transparent; border: 1px solid transparent;
-    border-radius: 4px; color: var(--text-muted); cursor: pointer;
-    font-size: 10px; padding: 3px 6px; transition: all 0.15s;
-    font-family: 'IBM Plex Mono', monospace; text-align: center;
-  }
+  .refresh-btn { background: transparent; border: 1px solid transparent; border-radius: 4px; color: var(--text-muted); cursor: pointer; font-size: 10px; padding: 3px 6px; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; text-align: center; }
   .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .stats-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
-    background: var(--border); border: 1px solid var(--border);
-    border-radius: 5px; overflow: hidden;
-  }
-  .stat-cell {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 5px 8px; background: var(--surface2);
-  }
-  .stat-cell-label {
-    font-size: 9px; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.5px;
-    font-family: 'IBM Plex Mono', monospace; white-space: nowrap;
-  }
-  .stat-cell input {
-    background: transparent; border: none;
-    border-bottom: 1px solid transparent;
-    color: var(--text-dim); font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px; font-weight: 500; outline: none;
-    width: 100%; padding: 0; transition: border-color 0.15s, color 0.15s;
-  }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+  .stat-cell { display: flex; flex-direction: column; gap: 3px; padding: 5px 8px; background: var(--surface2); }
+  .stat-cell-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .stat-cell input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; outline: none; width: 100%; padding: 0; transition: border-color 0.15s, color 0.15s; }
   .stat-cell input:focus { border-bottom-color: var(--border-light); color: var(--text); }
-  .stat-cell input.pos { color: var(--green); }
-  .stat-cell input.neg { color: var(--red); }
+  .stat-cell input.pos { color: var(--green); } .stat-cell input.neg { color: var(--red); }
   .stat-cell input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+  /* GRADE PANEL */
+  .grade-panel { border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+  .grade-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .grade-panel-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+  .grade-selected-display { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text-muted); transition: color 0.2s; }
+  .grade-btns { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1px; background: var(--border); }
+  .grade-btn { background: var(--surface2); border: none; cursor: pointer; padding: 7px 4px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-muted); transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 2px; border-top: 2px solid transparent; }
+  .grade-btn:hover { background: var(--surface); }
+  .grade-btn .grade-letter { font-size: 13px; }
+  .grade-btn .grade-risk   { font-size: 8px; font-weight: 400; opacity: 0.6; }
+  .grade-btn[data-grade="A+"].active { background: var(--grade-ap-dim); color: var(--grade-ap); border-top-color: var(--grade-ap); }
+  .grade-btn[data-grade="A"].active  { background: var(--grade-a-dim);  color: var(--grade-a);  border-top-color: var(--grade-a); }
+  .grade-btn[data-grade="B"].active  { background: var(--grade-b-dim);  color: var(--grade-b);  border-top-color: var(--grade-b); }
+  .grade-btn[data-grade="C"].active  { background: var(--grade-c-dim);  color: var(--grade-c);  border-top-color: var(--grade-c); }
+  .grade-result { padding: 6px 8px; background: var(--surface2); display: flex; align-items: center; justify-content: space-between; min-height: 30px; }
+  .grade-result-desc { font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; color: var(--text-muted); font-style: italic; transition: color 0.2s; }
+  .grade-result-risk { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-muted); transition: color 0.2s; }
 
   .panels { display: contents; }
   .panel { padding: 12px 14px; }
-  .panel-long {
-    border-right: 1px solid var(--border);
-    background: linear-gradient(160deg, var(--green-dim) 0%, transparent 60%);
-  }
-  .panel-short {
-    background: linear-gradient(160deg, var(--red-dim) 0%, transparent 60%);
-  }
-  .panel-title {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
-    letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .panel-long  .panel-title { color: var(--green); }
-  .panel-short .panel-title { color: var(--red); }
-  .panel-title::before {
-    content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block;
-  }
-  .panel-long  .panel-title::before { background: var(--green); }
-  .panel-short .panel-title::before { background: var(--red); }
-
-  .setup-input {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 4px; color: var(--text-dim);
-    font-family: 'IBM Plex Sans', sans-serif; font-size: 11px;
-    padding: 4px 8px; outline: none; width: 100%; margin-bottom: 8px;
-  }
+  .panel-long { border-right: 1px solid var(--border); background: linear-gradient(160deg, var(--green-dim) 0%, transparent 60%); }
+  .panel-short { background: linear-gradient(160deg, var(--red-dim) 0%, transparent 60%); }
+  .panel-title { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .panel-long .panel-title { color: var(--green); } .panel-short .panel-title { color: var(--red); }
+  .panel-title::before { content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+  .panel-long .panel-title::before { background: var(--green); } .panel-short .panel-title::before { background: var(--red); }
+  .setup-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--text-dim); font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; padding: 4px 8px; outline: none; width: 100%; margin-bottom: 8px; }
   .setup-input:focus { border-color: var(--border-light); }
-
   .field-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
   .field { display: flex; flex-direction: column; gap: 3px; }
-  .field label {
-    font-size: 9px; color: var(--text-muted); text-transform: uppercase;
-    letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace;
-  }
-  .field input {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 4px; color: var(--text);
-    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-    font-weight: 500; padding: 5px 7px; outline: none; width: 100%;
-    transition: border-color 0.15s;
-  }
-  .panel-long  .field input:focus { border-color: var(--green-mid); }
-  .panel-short .field input:focus { border-color: var(--red-mid); }
-
+  .field label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace; }
+  .field input { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 5px 7px; outline: none; width: 100%; transition: border-color 0.15s; }
+  .panel-long .field input:focus { border-color: var(--green-mid); } .panel-short .field input:focus { border-color: var(--red-mid); }
   .results { border-radius: 5px; padding: 8px 10px; }
-  .panel-long  .results { background: rgba(0,200,122,0.06); border: 1px solid rgba(0,200,122,0.15); }
+  .panel-long .results { background: rgba(0,200,122,0.06); border: 1px solid rgba(0,200,122,0.15); }
   .panel-short .results { background: rgba(255,77,106,0.06); border: 1px solid rgba(255,77,106,0.15); }
-  body.light .panel-long  .results { background: rgba(0,122,74,0.06); border: 1px solid rgba(0,122,74,0.20); }
+  body.light .panel-long .results { background: rgba(0,122,74,0.06); border: 1px solid rgba(0,122,74,0.20); }
   body.light .panel-short .results { background: rgba(192,0,31,0.05); border: 1px solid rgba(192,0,31,0.18); }
   .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
   .result-item { display: flex; justify-content: space-between; align-items: center; }
-  .result-label {
-    font-size: 9px; color: var(--text-muted); text-transform: uppercase;
-    letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace;
-  }
+  .result-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace; }
   .result-value { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-muted); }
-  .result-value.active-long  { color: var(--green); }
-  .result-value.active-short { color: var(--red); }
-  .ev-display {
-    margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border);
-    text-align: center; font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px; font-weight: 600; color: var(--text-muted);
-  }
-  .ev-display.active-long  { color: var(--green); }
-  .ev-display.active-short { color: var(--red); }
-
-  .empty-state {
-    text-align: center; padding: 60px 20px; color: var(--text-muted);
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-    letter-spacing: 1.5px; text-transform: uppercase;
-  }
+  .result-value.active-long { color: var(--green); } .result-value.active-short { color: var(--red); }
+  .ev-display { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .ev-display.active-long { color: var(--green); } .ev-display.active-short { color: var(--red); }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
   .empty-state .glyph { font-size: 28px; margin-bottom: 10px; opacity: 0.2; }
-
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
 </head>
 <body>
-
 <div class="page-wrap">
-
 <div class="header">
   <div class="header-left">
     <h1>Daily Game Plan</h1>
@@ -337,420 +154,160 @@
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Light</button>
   </div>
 </div>
-
 <div class="add-bar">
-  <input type="text" id="newTicker" placeholder="TICKER" maxlength="8"
-    onkeydown="if(event.key==='Enter')addTicker()">
-  <textarea id="newNote" placeholder="Notes / catalyst / setup context..."
-    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addTicker();}"></textarea>
+  <input type="text" id="newTicker" placeholder="TICKER" maxlength="8" onkeydown="if(event.key==='Enter')addTicker()">
+  <textarea id="newNote" placeholder="Notes / catalyst / setup context..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addTicker();}"></textarea>
   <button class="btn" onclick="addTicker()">+ Add Ticker</button>
 </div>
-
 <div id="journal"></div>
-
 </div>
-
 <script>
-const STORAGE_KEY  = 'dgp_journal_v2';
-const SETTINGS_KEY = 'dgp_settings_v1';
-const THEME_KEY    = 'dgp_theme_v1';
-const POLYGON_KEY  = '2UzhPEeHv7rRDqYbeg0ocy2XBA2hwUFN';
+const STORAGE_KEY='dgp_journal_v2',SETTINGS_KEY='dgp_settings_v1',THEME_KEY='dgp_theme_v1';
+const POLYGON_KEY='2UzhPEeHv7rRDqYbeg0ocy2XBA2hwUFN';
+const MAX_RISK=100;
+const GRADES={
+  'A+': {min:60,max:80,desc:'Exceptional outlier · Full conviction'},
+  'A':  {min:30,max:40,desc:'Unusually strong · Controlled aggression'},
+  'B':  {min:10,max:15,desc:'Situational filler · Restrained'},
+  'C':  {min:5, max:5, desc:'Experimental · Data only'}
+};
+const GRADE_COLORS={'A+':'var(--grade-ap)','A':'var(--grade-a)','B':'var(--grade-b)','C':'var(--grade-c)'};
+let journal={},settings={accountSize:25500,riskPct:0.5},collapsed={};
 
-let journal  = {};
-let settings = { accountSize: 25500, riskPct: 0.5 };
-let collapsed = {};
+function toggleTheme(){const l=document.body.classList.toggle('light');document.getElementById('themeToggle').textContent=l?'🌙 Dark':'☀ Light';localStorage.setItem(THEME_KEY,l?'light':'dark');}
+function loadTheme(){const s=localStorage.getItem(THEME_KEY);if(s==='light'){document.body.classList.add('light');document.getElementById('themeToggle').textContent='🌙 Dark';}}
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function formatDateLabel(k){const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});}
+function loadAll(){try{const j=localStorage.getItem(STORAGE_KEY);if(j)journal=JSON.parse(j);}catch(e){journal={};}try{const s=localStorage.getItem(SETTINGS_KEY);if(s)settings=JSON.parse(s);}catch(e){}document.getElementById('accountSize').value=settings.accountSize;document.getElementById('riskPct').value=settings.riskPct;}
+function saveJournal(){localStorage.setItem(STORAGE_KEY,JSON.stringify(journal));}
+function saveSettings(){settings.accountSize=parseFloat(document.getElementById('accountSize').value)||25500;settings.riskPct=parseFloat(document.getElementById('riskPct').value)||0.5;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}
 
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light');
-  document.getElementById('themeToggle').textContent = isLight ? '🌙 Dark' : '☀ Light';
-  localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+function addTicker(){
+  const sym=document.getElementById('newTicker').value.trim().toUpperCase();
+  if(!sym)return;
+  const note=document.getElementById('newNote').value.trim();
+  const key=todayKey();
+  if(!journal[key])journal[key]={tickers:[]};
+  journal[key].tickers.push({id:Date.now(),sym,note,grade:null,stats:{price:'',change:'',float:'',atr:'',cvol:'',avgvol:'',relvol:'',short:'',pe:'',margin:'',rsi:'',mktcap:''},long:{setup:'',entry:'',exit:'',stop:''},short:{setup:'',entry:'',exit:'',stop:''}});
+  saveJournal();document.getElementById('newTicker').value='';document.getElementById('newNote').value='';renderJournal();document.getElementById('newTicker').focus();
 }
 
-function loadTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  if (saved === 'light') {
-    document.body.classList.add('light');
-    document.getElementById('themeToggle').textContent = '🌙 Dark';
-  }
+function removeTicker(dk,id){if(!journal[dk])return;journal[dk].tickers=journal[dk].tickers.filter(t=>t.id!==id);if(!journal[dk].tickers.length)delete journal[dk];saveJournal();renderJournal();}
+function updateField(dk,id,side,field,value){const t=getTicker(dk,id);if(!t)return;t[side][field]=value;saveJournal();calcDisplay(dk,id,side);}
+function updateStat(dk,id,field,value){const t=getTicker(dk,id);if(!t)return;if(!t.stats)t.stats={};t.stats[field]=value;saveJournal();if(field==='change'){const el=document.getElementById(`stat-change-${dk}-${id}`);if(el){const v=parseFloat(value);el.className=isNaN(v)?'':(v>=0?'pos':'neg');}}}
+function getTicker(dk,id){const day=journal[dk];if(!day)return null;return day.tickers.find(t=>t.id===id)||null;}
+
+function setGrade(dk,id,grade){
+  const t=getTicker(dk,id);if(!t)return;
+  t.grade=(t.grade===grade)?null:grade;
+  saveJournal();updateGradeDisplay(dk,id,t.grade);
 }
 
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function formatDateLabel(key) {
-  const [y, m, d] = key.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US',
-    { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-}
-
-function loadAll() {
-  try { const j = localStorage.getItem(STORAGE_KEY); if (j) journal = JSON.parse(j); } catch(e) { journal = {}; }
-  try { const s = localStorage.getItem(SETTINGS_KEY); if (s) settings = JSON.parse(s); } catch(e) {}
-  document.getElementById('accountSize').value = settings.accountSize;
-  document.getElementById('riskPct').value     = settings.riskPct;
-}
-
-function saveJournal()  { localStorage.setItem(STORAGE_KEY, JSON.stringify(journal)); }
-function saveSettings() {
-  settings.accountSize = parseFloat(document.getElementById('accountSize').value) || 25500;
-  settings.riskPct     = parseFloat(document.getElementById('riskPct').value) || 0.5;
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-}
-
-function addTicker() {
-  const sym = document.getElementById('newTicker').value.trim().toUpperCase();
-  if (!sym) return;
-  const note = document.getElementById('newNote').value.trim();
-  const key  = todayKey();
-  if (!journal[key]) journal[key] = { tickers: [] };
-  journal[key].tickers.push({
-    id: Date.now(), sym, note,
-    stats: { price:'', change:'', float:'', atr:'', cvol:'', avgvol:'', relvol:'', short:'', pe:'', margin:'', rsi:'', mktcap:'' },
-    long:  { setup:'', entry:'', exit:'', stop:'' },
-    short: { setup:'', entry:'', exit:'', stop:'' }
-  });
-  saveJournal();
-  document.getElementById('newTicker').value = '';
-  document.getElementById('newNote').value   = '';
-  renderJournal();
-  document.getElementById('newTicker').focus();
-}
-
-function removeTicker(dateKey, id) {
-  if (!journal[dateKey]) return;
-  journal[dateKey].tickers = journal[dateKey].tickers.filter(t => t.id !== id);
-  if (!journal[dateKey].tickers.length) delete journal[dateKey];
-  saveJournal();
-  renderJournal();
-}
-
-function updateField(dateKey, id, side, field, value) {
-  const t = getTicker(dateKey, id);
-  if (!t) return;
-  t[side][field] = value;
-  saveJournal();
-  calcDisplay(dateKey, id, side);
-}
-
-function updateStat(dateKey, id, field, value) {
-  const t = getTicker(dateKey, id);
-  if (!t) return;
-  if (!t.stats) t.stats = {};
-  t.stats[field] = value;
-  saveJournal();
-  if (field === 'change') {
-    const el = document.getElementById(`stat-change-${dateKey}-${id}`);
-    if (el) {
-      const v = parseFloat(value);
-      el.className = isNaN(v) ? '' : (v >= 0 ? 'pos' : 'neg');
-    }
-  }
-}
-
-function getTicker(dateKey, id) {
-  const day = journal[dateKey];
-  if (!day) return null;
-  return day.tickers.find(t => t.id === id) || null;
-}
-
-async function fetchStats(dateKey, id) {
-  const t = getTicker(dateKey, id);
-  if (!t) return;
-  const btn = document.getElementById(`fetch-${dateKey}-${id}`);
-  if (btn) { btn.textContent = '...'; btn.classList.add('loading'); }
-
-  try {
-    if (!t.stats) t.stats = {};
-
-    const aggRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?adjusted=true&apiKey=${POLYGON_KEY}`);
-    const aggData = await aggRes.json();
-    const bar     = aggData?.results?.[0];
-    if (bar) {
-      t.stats.price  = bar.c ? bar.c.toFixed(2) : t.stats.price;
-      t.stats.cvol   = bar.v ? formatVol(bar.v) : t.stats.cvol;
-      t.stats.avgvol = bar.v ? formatVol(bar.v) : t.stats.avgvol;
-      if (bar.o && bar.c) {
-        t.stats.change = ((bar.c - bar.o) / bar.o * 100).toFixed(2);
-      }
-    }
-
-    const detailRes  = await fetch(`https://api.polygon.io/v3/reference/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
-    const detailData = await detailRes.json();
-    const detail     = detailData?.results;
-    if (detail) {
-      if (detail.share_class_shares_outstanding) t.stats.float  = formatVol(detail.share_class_shares_outstanding);
-      if (detail.market_cap)                     t.stats.mktcap = formatMktCap(detail.market_cap);
-    }
-
-    const rsiRes  = await fetch(`https://api.polygon.io/v1/indicators/rsi/${t.sym}?timespan=day&window=14&series_type=close&limit=1&apiKey=${POLYGON_KEY}`);
-    const rsiData = await rsiRes.json();
-    const rsiVal  = rsiData?.results?.values?.[0]?.value;
-    if (rsiVal) t.stats.rsi = rsiVal.toFixed(1);
-
-    const today   = new Date();
-    const from    = new Date(today); from.setDate(from.getDate() - 40);
-    const fromStr = from.toISOString().slice(0, 10);
-    const toStr   = today.toISOString().slice(0, 10);
-    const atrRes  = await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/range/1/day/${fromStr}/${toStr}?adjusted=true&sort=desc&limit=20&apiKey=${POLYGON_KEY}`);
-    const atrData = await atrRes.json();
-    const bars    = atrData?.results;
-    if (bars && bars.length >= 2) {
-      const trValues = [];
-      for (let i = 0; i < bars.length - 1; i++) {
-        const tr = Math.max(
-          bars[i].h - bars[i].l,
-          Math.abs(bars[i].h - bars[i + 1].c),
-          Math.abs(bars[i].l - bars[i + 1].c)
-        );
-        trValues.push(tr);
-      }
-      const atr = trValues.slice(0, 14).reduce((a, b) => a + b, 0) / Math.min(trValues.length, 14);
-      t.stats.atr = atr.toFixed(2);
-    }
-
-    saveJournal();
-    renderJournal();
-
-  } catch(e) {
-    console.error('Fetch error:', e);
-    if (btn) btn.textContent = 'Error';
-    setTimeout(() => { if (btn) { btn.textContent = 'Fetch'; btn.classList.remove('loading'); } }, 1500);
+function updateGradeDisplay(dk,id,grade){
+  const g=GRADES[grade];
+  const prefix=`grade-${dk}-${id}`;
+  Object.keys(GRADES).forEach(k=>{const b=document.getElementById(`${prefix}-btn-${k}`);if(b)b.classList.toggle('active',k===grade);});
+  const descEl=document.getElementById(`${prefix}-desc`);
+  const riskEl=document.getElementById(`${prefix}-risk`);
+  const dispEl=document.getElementById(`${prefix}-display`);
+  if(!g){
+    if(descEl){descEl.textContent='No grade assigned';descEl.style.color='';}
+    if(riskEl){riskEl.textContent='—';riskEl.style.color='';}
+    if(dispEl){dispEl.textContent='Grade —';dispEl.style.color='';}
     return;
   }
-
-  if (btn) { btn.textContent = 'Fetch'; btn.classList.remove('loading'); }
+  const col=GRADE_COLORS[grade];
+  const rr=g.min===g.max?`$${g.min}`:`$${g.min}–$${g.max}`;
+  if(descEl){descEl.textContent=g.desc;descEl.style.color=col;}
+  if(riskEl){riskEl.textContent=rr+' risk';riskEl.style.color=col;}
+  if(dispEl){dispEl.textContent=`Grade ${grade}`;dispEl.style.color=col;}
 }
 
-function formatVol(n) {
-  if (!n) return '—';
-  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
-  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
-  return n.toString();
+async function fetchStats(dk,id){
+  const t=getTicker(dk,id);if(!t)return;
+  const btn=document.getElementById(`fetch-${dk}-${id}`);
+  if(btn){btn.textContent='...';btn.classList.add('loading');}
+  try{
+    if(!t.stats)t.stats={};
+    const aggRes=await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?adjusted=true&apiKey=${POLYGON_KEY}`);
+    const aggData=await aggRes.json();const bar=aggData?.results?.[0];
+    if(bar){t.stats.price=bar.c?bar.c.toFixed(2):t.stats.price;t.stats.cvol=bar.v?formatVol(bar.v):t.stats.cvol;t.stats.avgvol=bar.v?formatVol(bar.v):t.stats.avgvol;if(bar.o&&bar.c)t.stats.change=((bar.c-bar.o)/bar.o*100).toFixed(2);}
+    const dRes=await fetch(`https://api.polygon.io/v3/reference/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
+    const dData=await dRes.json();const det=dData?.results;
+    if(det){if(det.share_class_shares_outstanding)t.stats.float=formatVol(det.share_class_shares_outstanding);if(det.market_cap)t.stats.mktcap=formatMktCap(det.market_cap);}
+    const rsiRes=await fetch(`https://api.polygon.io/v1/indicators/rsi/${t.sym}?timespan=day&window=14&series_type=close&limit=1&apiKey=${POLYGON_KEY}`);
+    const rsiData=await rsiRes.json();const rv=rsiData?.results?.values?.[0]?.value;if(rv)t.stats.rsi=rv.toFixed(1);
+    const today=new Date();const from=new Date(today);from.setDate(from.getDate()-40);
+    const atrRes=await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/range/1/day/${from.toISOString().slice(0,10)}/${today.toISOString().slice(0,10)}?adjusted=true&sort=desc&limit=20&apiKey=${POLYGON_KEY}`);
+    const atrData=await atrRes.json();const bars=atrData?.results;
+    if(bars&&bars.length>=2){const trV=[];for(let i=0;i<bars.length-1;i++){trV.push(Math.max(bars[i].h-bars[i].l,Math.abs(bars[i].h-bars[i+1].c),Math.abs(bars[i].l-bars[i+1].c)));}t.stats.atr=(trV.slice(0,14).reduce((a,b)=>a+b,0)/Math.min(trV.length,14)).toFixed(2);}
+    saveJournal();renderJournal();
+  }catch(e){console.error(e);if(btn)btn.textContent='Error';setTimeout(()=>{if(btn){btn.textContent='Fetch';btn.classList.remove('loading');}},1500);return;}
+  if(btn){btn.textContent='Fetch';btn.classList.remove('loading');}
 }
 
-function formatMktCap(n) {
-  if (!n) return '—';
-  if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
-  if (n >= 1e9)  return (n / 1e9).toFixed(1) + 'B';
-  if (n >= 1e6)  return (n / 1e6).toFixed(0) + 'M';
-  return n.toString();
+function formatVol(n){if(!n)return'—';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n.toString();}
+function formatMktCap(n){if(!n)return'—';if(n>=1e12)return(n/1e12).toFixed(2)+'T';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(0)+'M';return n.toString();}
+
+function calcDisplay(dk,id,side){
+  const t=getTicker(dk,id);if(!t)return;
+  const entry=parseFloat(t[side].entry),exit=parseFloat(t[side].exit),stop=parseFloat(t[side].stop);
+  const acct=parseFloat(document.getElementById('accountSize').value)||25500;
+  const rpct=parseFloat(document.getElementById('riskPct').value)||0.5;
+  const rDol=(acct*rpct)/100;
+  const uid=`${dk}-${id}-${side}`;const cls=side==='long'?'active-long':'active-short';
+  const set=(s,v,a)=>{const el=document.getElementById(`${s}-${uid}`);if(!el)return;el.textContent=v;el.className='result-value'+(a?` ${cls}`:'');};
+  const setEv=(v,a)=>{const el=document.getElementById(`ev-${uid}`);if(!el)return;el.textContent=v;el.className='ev-display'+(a?` ${cls}`:'');};
+  if(!entry||!stop||isNaN(entry)||isNaN(stop)||entry===stop){set('shares','—',false);set('riskdol','—',false);set('risksh','—',false);set('profit','—',false);setEv('R:R —',false);return;}
+  const rPerSh=Math.abs(entry-stop),shares=Math.floor(rDol/rPerSh),rTotal=(shares*rPerSh).toFixed(2);
+  set('shares',shares.toLocaleString(),true);set('riskdol','$'+rTotal,true);set('risksh','$'+rPerSh.toFixed(2),true);
+  if(!isNaN(exit)&&exit&&exit!==entry){const pPerSh=Math.abs(exit-entry);set('profit','$'+(shares*pPerSh).toFixed(2),true);setEv('EV: '+(pPerSh/rPerSh).toFixed(2)+'R',true);}
+  else{set('profit','—',false);setEv('R:R —',false);}
 }
 
-function calcDisplay(dateKey, id, side) {
-  const t = getTicker(dateKey, id);
-  if (!t) return;
-  const entry = parseFloat(t[side].entry);
-  const exit  = parseFloat(t[side].exit);
-  const stop  = parseFloat(t[side].stop);
-  const acct  = parseFloat(document.getElementById('accountSize').value) || 25500;
-  const rpct  = parseFloat(document.getElementById('riskPct').value) || 0.5;
-  const rDol  = (acct * rpct) / 100;
-  const uid   = `${dateKey}-${id}-${side}`;
-  const cls   = side === 'long' ? 'active-long' : 'active-short';
+function recalcAll(){saveSettings();Object.keys(journal).forEach(dk=>{(journal[dk].tickers||[]).forEach(t=>{calcDisplay(dk,t.id,'long');calcDisplay(dk,t.id,'short');});});}
+function toggleCollapse(dk){collapsed[dk]=!collapsed[dk];const body=document.getElementById(`group-body-${dk}`);const btn=document.getElementById(`collapse-btn-${dk}`);if(body)body.classList.toggle('collapsed',collapsed[dk]);if(btn)btn.textContent=collapsed[dk]?'▸ Show':'▾ Hide';}
 
-  const set = (suffix, val, active) => {
-    const el = document.getElementById(`${suffix}-${uid}`);
-    if (!el) return;
-    el.textContent = val;
-    el.className = 'result-value' + (active ? ` ${cls}` : '');
-  };
-  const setEv = (val, active) => {
-    const el = document.getElementById(`ev-${uid}`);
-    if (!el) return;
-    el.textContent = val;
-    el.className = 'ev-display' + (active ? ` ${cls}` : '');
-  };
-
-  if (!entry || !stop || isNaN(entry) || isNaN(stop) || entry === stop) {
-    set('shares','—',false); set('riskdol','—',false);
-    set('risksh','—',false); set('profit','—',false);
-    setEv('R:R —', false); return;
-  }
-
-  const rPerSh = Math.abs(entry - stop);
-  const shares = Math.floor(rDol / rPerSh);
-  const rTotal = (shares * rPerSh).toFixed(2);
-
-  set('shares',  shares.toLocaleString(), true);
-  set('riskdol', '$' + rTotal, true);
-  set('risksh',  '$' + rPerSh.toFixed(2), true);
-
-  if (!isNaN(exit) && exit && exit !== entry) {
-    const pPerSh = Math.abs(exit - entry);
-    set('profit', '$' + (shares * pPerSh).toFixed(2), true);
-    setEv('EV: ' + (pPerSh / rPerSh).toFixed(2) + 'R', true);
-  } else {
-    set('profit','—',false);
-    setEv('R:R —', false);
-  }
-}
-
-function recalcAll() {
-  saveSettings();
-  Object.keys(journal).forEach(dk => {
-    (journal[dk].tickers || []).forEach(t => {
-      calcDisplay(dk, t.id, 'long');
-      calcDisplay(dk, t.id, 'short');
-    });
-  });
-}
-
-function toggleCollapse(dateKey) {
-  collapsed[dateKey] = !collapsed[dateKey];
-  const body = document.getElementById(`group-body-${dateKey}`);
-  const btn  = document.getElementById(`collapse-btn-${dateKey}`);
-  if (body) body.classList.toggle('collapsed', collapsed[dateKey]);
-  if (btn)  btn.textContent = collapsed[dateKey] ? '▸ Show' : '▾ Hide';
-}
-
-function renderJournal() {
-  const container = document.getElementById('journal');
-  const keys = Object.keys(journal).sort((a,b) => b.localeCompare(a));
-
-  if (!keys.length) {
-    container.innerHTML = `<div class="empty-state"><div class="glyph">◈</div>Add your first ticker above to begin</div>`;
-    return;
-  }
-
-  const today = todayKey();
-  container.innerHTML = keys.map(dk => {
-    const tickers     = journal[dk].tickers || [];
-    const isToday     = dk === today;
-    const label       = (isToday ? 'Today — ' : '') + formatDateLabel(dk);
-    const isCollapsed = collapsed[dk] || false;
-    const tickerHTML  = tickers.length
-      ? [...tickers].reverse().map(t => renderCard(dk, t)).join('')
-      : '<div style="padding:12px 0;color:var(--text-muted);font-size:11px;text-align:center;">No tickers.</div>';
-
-    return `
-    <div class="date-group">
-      <div class="date-group-header" onclick="toggleCollapse('${dk}')">
-        <div class="date-group-header-left">
-          <span class="date-label ${isToday ? 'today' : ''}">${label}</span>
-          <span class="date-badge">${tickers.length} ticker${tickers.length !== 1 ? 's' : ''}</span>
-        </div>
-        <div class="date-divider"></div>
-        <button class="collapse-btn" id="collapse-btn-${dk}"
-          onclick="event.stopPropagation();toggleCollapse('${dk}')">
-          ${isCollapsed ? '▸ Show' : '▾ Hide'}
-        </button>
-      </div>
-      <div class="date-group-body ${isCollapsed ? 'collapsed' : ''}" id="group-body-${dk}">
-        ${tickerHTML}
-      </div>
-    </div>`;
+function renderGradePanel(dk,t){
+  const prefix=`grade-${dk}-${t.id}`;const grade=t.grade||null;const g=grade?GRADES[grade]:null;
+  const rr=g?(g.min===g.max?`$${g.min}`:`$${g.min}–$${g.max}`)+' risk':'—';
+  const desc=g?g.desc:'No grade assigned';
+  const disp=grade?`Grade ${grade}`:'Grade —';
+  const col=grade?GRADE_COLORS[grade]:'';
+  const btns=Object.entries(GRADES).map(([k,v])=>{
+    const rl=v.min===v.max?`$${v.min}`:`$${v.min}–$${v.max}`;
+    return `<button class="grade-btn${grade===k?' active':''}" data-grade="${k}" id="${prefix}-btn-${k}" onclick="setGrade('${dk}',${t.id},'${k}')"><span class="grade-letter">${k}</span><span class="grade-risk">${rl}</span></button>`;
   }).join('');
-
-  keys.forEach(dk => {
-    (journal[dk].tickers || []).forEach(t => {
-      calcDisplay(dk, t.id, 'long');
-      calcDisplay(dk, t.id, 'short');
-    });
-  });
+  return `<div class="grade-panel"><div class="grade-panel-header"><span class="grade-panel-label">Trade Grade</span><span class="grade-selected-display" id="${prefix}-display" style="color:${col}">${disp}</span></div><div class="grade-btns">${btns}</div><div class="grade-result"><span class="grade-result-desc" id="${prefix}-desc" style="color:${col}">${desc}</span><span class="grade-result-risk" id="${prefix}-risk" style="color:${col}">${rr}</span></div></div>`;
 }
 
-function renderCard(dk, t) {
-  const s = t.stats || {};
-  const changeCls = (() => { const v = parseFloat(s.change); return isNaN(v) ? '' : (v >= 0 ? 'pos' : 'neg'); })();
-
-  const statField = (label, field, placeholder) => `
-    <div class="stat-cell">
-      <span class="stat-cell-label">${label}</span>
-      <input id="stat-${field === 'change' ? `change-${dk}-${t.id}` : `${dk}-${t.id}-${field}`}"
-        value="${s[field] || ''}"
-        placeholder="${placeholder || '—'}"
-        class="${field === 'change' ? changeCls : ''}"
-        oninput="updateStat('${dk}',${t.id},'${field}',this.value)">
-    </div>`;
-
-  return `
-  <div class="ticker-card" id="card-${dk}-${t.id}">
-    <div class="card-left">
-      <div class="card-left-top">
-        <div class="card-left-title">
-          <span class="ticker-symbol">${t.sym}</span>
-          <span class="ticker-note">${t.note || ''}</span>
-        </div>
-        <div class="card-left-actions">
-          <button class="fetch-btn" id="fetch-${dk}-${t.id}"
-            onclick="fetchStats('${dk}',${t.id})">Fetch</button>
-          <button class="refresh-btn" onclick="fetchStats('${dk}',${t.id})" title="Refresh data">↻ Refresh</button>
-          <button class="btn-remove" onclick="removeTicker('${dk}',${t.id})" title="Delete ticker">✕ Delete</button>
-        </div>
-      </div>
-      <div class="stats-grid">
-        ${statField('Price',   'price',  '0.00')}
-        ${statField('Chg %',   'change', '0.00%')}
-        ${statField('Float',   'float',  '—')}
-        ${statField('ATR',     'atr',    '0.00')}
-        ${statField('Cur Vol', 'cvol',   '—')}
-        ${statField('Avg Vol', 'avgvol', '—')}
-        ${statField('Rel Vol', 'relvol', '—')}
-        ${statField('Short %', 'short',  '—')}
-        ${statField('P/E',     'pe',     '—')}
-        ${statField('Margin',  'margin', '—')}
-        ${statField('RSI',     'rsi',    '—')}
-        ${statField('Mkt Cap', 'mktcap', '—')}
-      </div>
-    </div>
-    <div class="panels">
-      ${renderPanel(dk, t, 'long')}
-      ${renderPanel(dk, t, 'short')}
-    </div>
-  </div>`;
+function renderJournal(){
+  const container=document.getElementById('journal');
+  const keys=Object.keys(journal).sort((a,b)=>b.localeCompare(a));
+  if(!keys.length){container.innerHTML=`<div class="empty-state"><div class="glyph">◈</div>Add your first ticker above to begin</div>`;return;}
+  const today=todayKey();
+  container.innerHTML=keys.map(dk=>{
+    const tickers=journal[dk].tickers||[];const isToday=dk===today;
+    const label=(isToday?'Today — ':'')+formatDateLabel(dk);const isCollapsed=collapsed[dk]||false;
+    const tickerHTML=tickers.length?[...tickers].reverse().map(t=>renderCard(dk,t)).join(''):'<div style="padding:12px 0;color:var(--text-muted);font-size:11px;text-align:center;">No tickers.</div>';
+    return `<div class="date-group"><div class="date-group-header" onclick="toggleCollapse('${dk}')"><div class="date-group-header-left"><span class="date-label ${isToday?'today':''}">${label}</span><span class="date-badge">${tickers.length} ticker${tickers.length!==1?'s':''}</span></div><div class="date-divider"></div><button class="collapse-btn" id="collapse-btn-${dk}" onclick="event.stopPropagation();toggleCollapse('${dk}')">${isCollapsed?'▸ Show':'▾ Hide'}</button></div><div class="date-group-body ${isCollapsed?'collapsed':''}" id="group-body-${dk}">${tickerHTML}</div></div>`;
+  }).join('');
+  keys.forEach(dk=>{(journal[dk].tickers||[]).forEach(t=>{calcDisplay(dk,t.id,'long');calcDisplay(dk,t.id,'short');updateGradeDisplay(dk,t.id,t.grade||null);});});
 }
 
-function renderPanel(dk, t, side) {
-  const cls   = side === 'long' ? 'panel-long' : 'panel-short';
-  const label = side === 'long' ? 'LONG' : 'SHORT';
-  const uid   = `${dk}-${t.id}-${side}`;
-  const data  = t[side];
-  return `
-  <div class="panel ${cls}">
-    <div class="panel-title">${label}</div>
-    <input class="setup-input" value="${data.setup || ''}" placeholder="Setup / notes..."
-      oninput="updateField('${dk}',${t.id},'${side}','setup',this.value)">
-    <div class="field-row">
-      <div class="field"><label>Entry</label>
-        <input type="number" value="${data.entry || ''}" placeholder="0.00" step="0.01"
-          oninput="updateField('${dk}',${t.id},'${side}','entry',this.value)"></div>
-      <div class="field"><label>Target</label>
-        <input type="number" value="${data.exit || ''}" placeholder="0.00" step="0.01"
-          oninput="updateField('${dk}',${t.id},'${side}','exit',this.value)"></div>
-      <div class="field"><label>Stop</label>
-        <input type="number" value="${data.stop || ''}" placeholder="0.00" step="0.01"
-          oninput="updateField('${dk}',${t.id},'${side}','stop',this.value)"></div>
-    </div>
-    <div class="results">
-      <div class="results-grid">
-        <div class="result-item">
-          <span class="result-label">Shares</span>
-          <span class="result-value" id="shares-${uid}">—</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">Risk $</span>
-          <span class="result-value" id="riskdol-${uid}">—</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">Risk/sh</span>
-          <span class="result-value" id="risksh-${uid}">—</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">Profit</span>
-          <span class="result-value" id="profit-${uid}">—</span>
-        </div>
-      </div>
-      <div class="ev-display" id="ev-${uid}">R:R —</div>
-    </div>
-  </div>`;
+function renderCard(dk,t){
+  const s=t.stats||{};
+  const changeCls=(()=>{const v=parseFloat(s.change);return isNaN(v)?'':(v>=0?'pos':'neg');})();
+  const sf=(label,field,ph)=>`<div class="stat-cell"><span class="stat-cell-label">${label}</span><input id="stat-${field==='change'?`change-${dk}-${t.id}`:`${dk}-${t.id}-${field}`}" value="${s[field]||''}" placeholder="${ph||'—'}" class="${field==='change'?changeCls:''}" oninput="updateStat('${dk}',${t.id},'${field}',this.value)"></div>`;
+  return `<div class="ticker-card" id="card-${dk}-${t.id}"><div class="card-left"><div class="card-left-top"><div class="card-left-title"><span class="ticker-symbol">${t.sym}</span><span class="ticker-note">${t.note||''}</span></div><div class="card-left-actions"><button class="fetch-btn" id="fetch-${dk}-${t.id}" onclick="fetchStats('${dk}',${t.id})">Fetch</button><button class="refresh-btn" onclick="fetchStats('${dk}',${t.id})" title="Refresh">↻ Refresh</button><button class="btn-remove" onclick="removeTicker('${dk}',${t.id})" title="Delete">✕ Delete</button></div></div><div class="stats-grid">${sf('Price','price','0.00')}${sf('Chg %','change','0.00%')}${sf('Float','float','—')}${sf('ATR','atr','0.00')}${sf('Cur Vol','cvol','—')}${sf('Avg Vol','avgvol','—')}${sf('Rel Vol','relvol','—')}${sf('Short %','short','—')}${sf('P/E','pe','—')}${sf('Margin','margin','—')}${sf('RSI','rsi','—')}${sf('Mkt Cap','mktcap','—')}</div>${renderGradePanel(dk,t)}</div><div class="panels">${renderPanel(dk,t,'long')}${renderPanel(dk,t,'short')}</div></div>`;
 }
 
-loadAll();
-loadTheme();
-renderJournal();
-document.getElementById('newTicker').focus();
+function renderPanel(dk,t,side){
+  const cls=side==='long'?'panel-long':'panel-short';const uid=`${dk}-${t.id}-${side}`;const data=t[side];
+  return `<div class="panel ${cls}"><div class="panel-title">${side==='long'?'LONG':'SHORT'}</div><input class="setup-input" value="${data.setup||''}" placeholder="Setup / notes..." oninput="updateField('${dk}',${t.id},'${side}','setup',this.value)"><div class="field-row"><div class="field"><label>Entry</label><input type="number" value="${data.entry||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','entry',this.value)"></div><div class="field"><label>Target</label><input type="number" value="${data.exit||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','exit',this.value)"></div><div class="field"><label>Stop</label><input type="number" value="${data.stop||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','stop',this.value)"></div></div><div class="results"><div class="results-grid"><div class="result-item"><span class="result-label">Shares</span><span class="result-value" id="shares-${uid}">—</span></div><div class="result-item"><span class="result-label">Risk $</span><span class="result-value" id="riskdol-${uid}">—</span></div><div class="result-item"><span class="result-label">Risk/sh</span><span class="result-value" id="risksh-${uid}">—</span></div><div class="result-item"><span class="result-label">Profit</span><span class="result-value" id="profit-${uid}">—</span></div></div><div class="ev-display" id="ev-${uid}">R:R —</div></div></div>`;
+}
+
+loadAll();loadTheme();renderJournal();document.getElementById('newTicker').focus();
 </script>
 </body>
 </html>
