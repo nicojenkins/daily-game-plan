@@ -196,20 +196,31 @@ function updateField(dk,id,side,field,value){const t=getTicker(dk,id);if(!t)retu
 function updateStat(dk,id,field,value){const t=getTicker(dk,id);if(!t)return;if(!t.stats)t.stats={};t.stats[field]=value;saveJournal();if(field==='change'){const el=document.getElementById(`stat-change-${dk}-${id}`);if(el){const v=parseFloat(value);el.className=isNaN(v)?'':(v>=0?'pos':'neg');}}}
 function getTicker(dk,id){const day=journal[dk];if(!day)return null;return day.tickers.find(t=>t.id===id)||null;}
 
+// KEY FIX: resolve risk dollars per ticker — grade overrides global if set
+function getRiskDol(t){
+  if(t.grade && GRADES[t.grade]){
+    return GRADES[t.grade].riskDol;
+  }
+  const acct=parseFloat(document.getElementById('accountSize').value)||25500;
+  const rpct=parseFloat(document.getElementById('riskPct').value)||0.5;
+  return (acct*rpct)/100;
+}
+
 function setGrade(dk,id,grade){
   const t=getTicker(dk,id);if(!t)return;
   t.grade=(t.grade===grade)?null:grade;
   saveJournal();
   updateGradeDisplay(dk,id,t.grade);
-  // Push risk % to header
+  // Update header to reflect this ticker's grade (for reference), but only recalc this ticker
   const acct=parseFloat(document.getElementById('accountSize').value)||25500;
-  if(t.grade&&GRADES[t.grade]){
-    const riskDol=GRADES[t.grade].riskDol;
-    const newPct=((riskDol/acct)*100).toFixed(2);
+  if(t.grade && GRADES[t.grade]){
+    const newPct=((GRADES[t.grade].riskDol/acct)*100).toFixed(2);
     document.getElementById('riskPct').value=newPct;
     saveSettings();
   }
-  recalcAll();
+  // Only recalc THIS ticker, not all
+  calcDisplay(dk,id,'long');
+  calcDisplay(dk,id,'short');
 }
 
 function updateGradeDisplay(dk,id,grade){
@@ -260,9 +271,8 @@ function formatMktCap(n){if(!n)return'—';if(n>=1e12)return(n/1e12).toFixed(2)+
 function calcDisplay(dk,id,side){
   const t=getTicker(dk,id);if(!t)return;
   const entry=parseFloat(t[side].entry),exit=parseFloat(t[side].exit),stop=parseFloat(t[side].stop);
-  const acct=parseFloat(document.getElementById('accountSize').value)||25500;
-  const rpct=parseFloat(document.getElementById('riskPct').value)||0.5;
-  const rDol=(acct*rpct)/100;
+  // Use per-ticker risk dollar (grade-aware)
+  const rDol=getRiskDol(t);
   const uid=`${dk}-${id}-${side}`;const cls=side==='long'?'active-long':'active-short';
   const set=(s,v,a)=>{const el=document.getElementById(`${s}-${uid}`);if(!el)return;el.textContent=v;el.className='result-value'+(a?` ${cls}`:'');};
   const setEv=(v,a)=>{const el=document.getElementById(`ev-${uid}`);if(!el)return;el.textContent=v;el.className='ev-display'+(a?` ${cls}`:'');};
@@ -273,7 +283,16 @@ function calcDisplay(dk,id,side){
   else{set('profit','—',false);setEv('R:R —',false);}
 }
 
-function recalcAll(){saveSettings();Object.keys(journal).forEach(dk=>{(journal[dk].tickers||[]).forEach(t=>{calcDisplay(dk,t.id,'long');calcDisplay(dk,t.id,'short');});});}
+function recalcAll(){
+  saveSettings();
+  Object.keys(journal).forEach(dk=>{
+    (journal[dk].tickers||[]).forEach(t=>{
+      calcDisplay(dk,t.id,'long');
+      calcDisplay(dk,t.id,'short');
+    });
+  });
+}
+
 function toggleCollapse(dk){collapsed[dk]=!collapsed[dk];const body=document.getElementById(`group-body-${dk}`);const btn=document.getElementById(`collapse-btn-${dk}`);if(body)body.classList.toggle('collapsed',collapsed[dk]);if(btn)btn.textContent=collapsed[dk]?'▸ Show':'▾ Hide';}
 
 function renderGradePanel(dk,t){
