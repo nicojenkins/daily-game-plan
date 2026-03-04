@@ -40,7 +40,7 @@
   .config-pill { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; }
   .config-pill label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
   .config-pill input { background: transparent; border: none; color: var(--gold); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; outline: none; text-align: right; }
-  #accountSize { width: 85px; } #riskPct { width: 45px; }
+  #accountSize { width: 85px; } #riskPct { width: 45px; } #maxRisk { width: 55px; }
   .theme-toggle { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 6px 12px; transition: all 0.15s; white-space: nowrap; }
   .theme-toggle:hover { border-color: var(--border-light); color: var(--text); }
   .add-bar { display: flex; gap: 10px; margin-bottom: 24px; align-items: stretch; }
@@ -90,7 +90,7 @@
   .grade-btn { background: var(--surface2); border: none; cursor: pointer; padding: 7px 4px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-muted); transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 2px; border-top: 2px solid transparent; }
   .grade-btn:hover { background: var(--surface); }
   .grade-btn .grade-letter { font-size: 13px; }
-  .grade-btn .grade-risk { font-size: 8px; font-weight: 400; opacity: 0.6; }
+  .grade-btn .grade-pct { font-size: 8px; font-weight: 400; opacity: 0.6; }
   .grade-btn[data-grade="A+"].active { background: var(--grade-ap-dim); color: var(--grade-ap); border-top-color: var(--grade-ap); }
   .grade-btn[data-grade="A"].active  { background: var(--grade-a-dim);  color: var(--grade-a);  border-top-color: var(--grade-a); }
   .grade-btn[data-grade="B"].active  { background: var(--grade-b-dim);  color: var(--grade-b);  border-top-color: var(--grade-b); }
@@ -148,6 +148,10 @@
       <label>Risk %</label>
       <input type="number" id="riskPct" value="0.5" step="0.01" oninput="saveSettings();recalcAll()">
     </div>
+    <div class="config-pill">
+      <label>Max Risk $</label>
+      <input type="number" id="maxRisk" value="100" step="1" oninput="saveSettings();recalcAll()" title="Maximum dollar risk per trade (A+ grade). All grades scale from this.">
+    </div>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Light</button>
   </div>
 </div>
@@ -159,26 +163,51 @@
 <div id="journal"></div>
 </div>
 <script>
-const STORAGE_KEY='dgp_journal_v2',SETTINGS_KEY='dgp_settings_v1',THEME_KEY='dgp_theme_v1';
+const STORAGE_KEY='dgp_journal_v2',SETTINGS_KEY='dgp_settings_v2',THEME_KEY='dgp_theme_v1';
 const TWELVE_KEY='ea4fa67ba897494ab3b7b9da3b3c8731';
 
-const GRADES={
-  'A+': {min:60, max:80, riskDol:80, desc:'Exceptional outlier · Full conviction'},
-  'A':  {min:30, max:40, riskDol:40, desc:'Unusually strong · Controlled aggression'},
-  'B':  {min:10, max:15, riskDol:15, desc:'Situational filler · Restrained'},
-  'C':  {min:5,  max:5,  riskDol:5,  desc:'Experimental · Data only'}
+// Grade tiers defined as fractions of maxRisk
+// A+ = 100%, A = 50%, B = 20%, C = 5%
+const GRADE_TIERS = {
+  'A+': { pct: 1.00, desc: 'Exceptional outlier · Full conviction' },
+  'A':  { pct: 0.50, desc: 'Unusually strong · Controlled aggression' },
+  'B':  { pct: 0.20, desc: 'Situational filler · Restrained' },
+  'C':  { pct: 0.05, desc: 'Experimental · Data only' }
 };
+
 const GRADE_COLORS={'A+':'var(--grade-ap)','A':'var(--grade-a)','B':'var(--grade-b)','C':'var(--grade-c)'};
 
-let journal={},settings={accountSize:25500,riskPct:0.5},collapsed={};
+// Returns the live GRADES object with dollar amounts derived from current maxRisk setting
+function getGrades() {
+  const maxR = parseFloat(document.getElementById('maxRisk').value) || 100;
+  const grades = {};
+  for (const [k, v] of Object.entries(GRADE_TIERS)) {
+    const rDol = Math.round(maxR * v.pct);
+    grades[k] = { riskDol: rDol, desc: v.desc };
+  }
+  return grades;
+}
+
+let journal={},settings={accountSize:25500,riskPct:0.5,maxRisk:100},collapsed={};
 
 function toggleTheme(){const l=document.body.classList.toggle('light');document.getElementById('themeToggle').textContent=l?'🌙 Dark':'☀ Light';localStorage.setItem(THEME_KEY,l?'light':'dark');}
 function loadTheme(){const s=localStorage.getItem(THEME_KEY);if(s==='light'){document.body.classList.add('light');document.getElementById('themeToggle').textContent='🌙 Dark';}}
 function todayKey(){return new Date().toISOString().slice(0,10);}
 function formatDateLabel(k){const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});}
-function loadAll(){try{const j=localStorage.getItem(STORAGE_KEY);if(j)journal=JSON.parse(j);}catch(e){journal={};}try{const s=localStorage.getItem(SETTINGS_KEY);if(s)settings=JSON.parse(s);}catch(e){}document.getElementById('accountSize').value=settings.accountSize;document.getElementById('riskPct').value=settings.riskPct;}
+function loadAll(){
+  try{const j=localStorage.getItem(STORAGE_KEY);if(j)journal=JSON.parse(j);}catch(e){journal={};}
+  try{const s=localStorage.getItem(SETTINGS_KEY);if(s)settings=JSON.parse(s);}catch(e){}
+  document.getElementById('accountSize').value=settings.accountSize;
+  document.getElementById('riskPct').value=settings.riskPct;
+  document.getElementById('maxRisk').value=settings.maxRisk||100;
+}
 function saveJournal(){localStorage.setItem(STORAGE_KEY,JSON.stringify(journal));}
-function saveSettings(){settings.accountSize=parseFloat(document.getElementById('accountSize').value)||25500;settings.riskPct=parseFloat(document.getElementById('riskPct').value)||0.5;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}
+function saveSettings(){
+  settings.accountSize=parseFloat(document.getElementById('accountSize').value)||25500;
+  settings.riskPct=parseFloat(document.getElementById('riskPct').value)||0.5;
+  settings.maxRisk=parseFloat(document.getElementById('maxRisk').value)||100;
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+}
 
 function addTicker(){
   const sym=document.getElementById('newTicker').value.trim().toUpperCase();
@@ -195,11 +224,13 @@ function updateField(dk,id,side,field,value){const t=getTicker(dk,id);if(!t)retu
 function updateStat(dk,id,field,value){const t=getTicker(dk,id);if(!t)return;if(!t.stats)t.stats={};t.stats[field]=value;saveJournal();if(field==='change'){const el=document.getElementById(`stat-change-${dk}-${id}`);if(el){const v=parseFloat(value);el.className=isNaN(v)?'':(v>=0?'pos':'neg');}}}
 function getTicker(dk,id){const day=journal[dk];if(!day)return null;return day.tickers.find(t=>t.id===id)||null;}
 
-function getRiskDol(t){
-  if(t.grade && GRADES[t.grade]) return GRADES[t.grade].riskDol;
-  const acct=parseFloat(document.getElementById('accountSize').value)||25500;
-  const rpct=parseFloat(document.getElementById('riskPct').value)||0.5;
-  return (acct*rpct)/100;
+function getRiskDol(t) {
+  const GRADES = getGrades();
+  if (t.grade && GRADES[t.grade]) return GRADES[t.grade].riskDol;
+  // Fallback: account-based risk % if no grade set
+  const acct = parseFloat(document.getElementById('accountSize').value) || 25500;
+  const rpct = parseFloat(document.getElementById('riskPct').value) || 0.5;
+  return (acct * rpct) / 100;
 }
 
 function setGrade(dk,id,grade){
@@ -213,11 +244,17 @@ function setGrade(dk,id,grade){
 }
 
 function updateGradeDisplay(dk,id,grade){
-  const g=GRADES[grade];
+  const GRADES = getGrades();
+  const g = GRADES[grade];
   const prefix=`grade-${dk}-${id}`;
-  Object.keys(GRADES).forEach(k=>{
+  Object.keys(GRADE_TIERS).forEach(k=>{
     const b=document.getElementById(`${prefix}-btn-${k}`);
-    if(b)b.classList.toggle('active',k===grade);
+    if(b) {
+      b.classList.toggle('active',k===grade);
+      // Update the dynamic dollar label on each button
+      const pctEl = b.querySelector('.grade-pct');
+      if (pctEl) pctEl.textContent = '$'+GRADES[k].riskDol;
+    }
   });
   const descEl=document.getElementById(`${prefix}-desc`);
   const riskEl=document.getElementById(`${prefix}-risk`);
@@ -229,9 +266,8 @@ function updateGradeDisplay(dk,id,grade){
     return;
   }
   const col=GRADE_COLORS[grade];
-  const rr=g.min===g.max?`$${g.min}`:`$${g.min}–$${g.max}`;
   if(descEl){descEl.textContent=g.desc;descEl.style.color=col;}
-  if(riskEl){riskEl.textContent=rr+' risk';riskEl.style.color=col;}
+  if(riskEl){riskEl.textContent='$'+g.riskDol+' risk';riskEl.style.color=col;}
   if(dispEl){dispEl.textContent=`Grade ${grade}`;dispEl.style.color=col;}
 }
 
@@ -243,7 +279,6 @@ async function fetchStats(dk,id){
   try{
     if(!t.stats)t.stats={};
 
-    // 1. Quote — price, change %, volume
     const qRes=await fetch(`https://api.twelvedata.com/quote?symbol=${t.sym}&apikey=${TWELVE_KEY}`);
     const q=await qRes.json();
     if(q && q.close){
@@ -253,17 +288,14 @@ async function fetchStats(dk,id){
       if(q.average_volume) t.stats.avgvol=formatVol(parseInt(q.average_volume));
     }
 
-    // 2. ATR (14-day)
     const atrRes=await fetch(`https://api.twelvedata.com/atr?symbol=${t.sym}&interval=1day&time_period=14&outputsize=1&apikey=${TWELVE_KEY}`);
     const atrData=await atrRes.json();
     if(atrData.values && atrData.values[0]) t.stats.atr=parseFloat(atrData.values[0].atr).toFixed(2);
 
-    // 3. RSI (14-day)
     const rsiRes=await fetch(`https://api.twelvedata.com/rsi?symbol=${t.sym}&interval=1day&time_period=14&outputsize=1&apikey=${TWELVE_KEY}`);
     const rsiData=await rsiRes.json();
     if(rsiData.values && rsiData.values[0]) t.stats.rsi=parseFloat(rsiData.values[0].rsi).toFixed(1);
 
-    // 4. Statistics — float, market cap, P/E
     const statsRes=await fetch(`https://api.twelvedata.com/statistics?symbol=${t.sym}&apikey=${TWELVE_KEY}`);
     const statsData=await statsRes.json();
     if(statsData.statistics){
@@ -305,8 +337,10 @@ function calcDisplay(dk,id,side){
 
 function recalcAll(){
   saveSettings();
+  // Refresh all grade button labels to reflect new maxRisk
   Object.keys(journal).forEach(dk=>{
     (journal[dk].tickers||[]).forEach(t=>{
+      updateGradeDisplay(dk,t.id,t.grade||null);
       calcDisplay(dk,t.id,'long');
       calcDisplay(dk,t.id,'short');
     });
@@ -316,14 +350,15 @@ function recalcAll(){
 function toggleCollapse(dk){collapsed[dk]=!collapsed[dk];const body=document.getElementById(`group-body-${dk}`);const btn=document.getElementById(`collapse-btn-${dk}`);if(body)body.classList.toggle('collapsed',collapsed[dk]);if(btn)btn.textContent=collapsed[dk]?'▸ Show':'▾ Hide';}
 
 function renderGradePanel(dk,t){
+  const GRADES = getGrades();
   const prefix=`grade-${dk}-${t.id}`;const grade=t.grade||null;const g=grade?GRADES[grade]:null;
-  const rr=g?(g.min===g.max?`$${g.min}`:`$${g.min}–$${g.max}`)+' risk':'—';
+  const riskStr = g ? '$'+g.riskDol+' risk' : '—';
   const col=grade?GRADE_COLORS[grade]:'';
-  const btns=Object.entries(GRADES).map(([k,v])=>{
-    const rl=v.min===v.max?`$${v.min}`:`$${v.min}–$${v.max}`;
-    return `<button class="grade-btn${grade===k?' active':''}" data-grade="${k}" id="${prefix}-btn-${k}" onclick="setGrade('${dk}',${t.id},'${k}')"><span class="grade-letter">${k}</span><span class="grade-risk">${rl}</span></button>`;
+  const btns=Object.entries(GRADE_TIERS).map(([k])=>{
+    const rDol = GRADES[k].riskDol;
+    return `<button class="grade-btn${grade===k?' active':''}" data-grade="${k}" id="${prefix}-btn-${k}" onclick="setGrade('${dk}',${t.id},'${k}')"><span class="grade-letter">${k}</span><span class="grade-pct">$${rDol}</span></button>`;
   }).join('');
-  return `<div class="grade-panel"><div class="grade-panel-header"><span class="grade-panel-label">Trade Grade</span><span class="grade-selected-display" id="${prefix}-display" style="color:${col}">${grade?`Grade ${grade}`:'Grade —'}</span></div><div class="grade-btns">${btns}</div><div class="grade-result"><span class="grade-result-desc" id="${prefix}-desc" style="color:${col}">${g?g.desc:'No grade assigned'}</span><span class="grade-result-risk" id="${prefix}-risk" style="color:${col}">${rr}</span></div></div>`;
+  return `<div class="grade-panel"><div class="grade-panel-header"><span class="grade-panel-label">Trade Grade</span><span class="grade-selected-display" id="${prefix}-display" style="color:${col}">${grade?`Grade ${grade}`:'Grade —'}</span></div><div class="grade-btns">${btns}</div><div class="grade-result"><span class="grade-result-desc" id="${prefix}-desc" style="color:${col}">${g?g.desc:'No grade assigned'}</span><span class="grade-result-risk" id="${prefix}-risk" style="color:${col}">${riskStr}</span></div></div>`;
 }
 
 function renderJournal(){
