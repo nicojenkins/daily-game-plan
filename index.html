@@ -166,24 +166,27 @@
 const STORAGE_KEY='dgp_journal_v2',SETTINGS_KEY='dgp_settings_v2',THEME_KEY='dgp_theme_v1';
 const TWELVE_KEY='ea4fa67ba897494ab3b7b9da3b3c8731';
 
-// Grade tiers defined as fractions of maxRisk
-// A+ = 100%, A = 50%, B = 20%, C = 5%
+// Grade tiers as % ranges of Max Risk
+// A+ = 60–80%, A = 30–40%, B = 10–15%, C = 5%
 const GRADE_TIERS = {
-  'A+': { pct: 1.00, desc: 'Exceptional outlier · Full conviction' },
-  'A':  { pct: 0.50, desc: 'Unusually strong · Controlled aggression' },
-  'B':  { pct: 0.20, desc: 'Situational filler · Restrained' },
-  'C':  { pct: 0.05, desc: 'Experimental · Data only' }
+  'A+': { minPct: 0.60, maxPct: 0.80, desc: 'Exceptional outlier · Full conviction' },
+  'A':  { minPct: 0.30, maxPct: 0.40, desc: 'Unusually strong · Controlled aggression' },
+  'B':  { minPct: 0.10, maxPct: 0.15, desc: 'Situational filler · Restrained' },
+  'C':  { minPct: 0.05, maxPct: 0.05, desc: 'Experimental · Data only' }
 };
 
 const GRADE_COLORS={'A+':'var(--grade-ap)','A':'var(--grade-a)','B':'var(--grade-b)','C':'var(--grade-c)'};
 
-// Returns the live GRADES object with dollar amounts derived from current maxRisk setting
+// Returns the live GRADES object with dollar ranges derived from current maxRisk setting
 function getGrades() {
   const maxR = parseFloat(document.getElementById('maxRisk').value) || 100;
   const grades = {};
   for (const [k, v] of Object.entries(GRADE_TIERS)) {
-    const rDol = Math.round(maxR * v.pct);
-    grades[k] = { riskDol: rDol, desc: v.desc };
+    const minDol = Math.round(maxR * v.minPct);
+    const maxDol = Math.round(maxR * v.maxPct);
+    // riskDol uses the midpoint for position sizing calculations
+    const riskDol = Math.round((minDol + maxDol) / 2);
+    grades[k] = { minDol, maxDol, riskDol, desc: v.desc };
   }
   return grades;
 }
@@ -251,9 +254,12 @@ function updateGradeDisplay(dk,id,grade){
     const b=document.getElementById(`${prefix}-btn-${k}`);
     if(b) {
       b.classList.toggle('active',k===grade);
-      // Update the dynamic dollar label on each button
+      // Update the dynamic dollar range label on each button
       const pctEl = b.querySelector('.grade-pct');
-      if (pctEl) pctEl.textContent = '$'+GRADES[k].riskDol;
+      if (pctEl) {
+        const { minDol, maxDol } = GRADES[k];
+        pctEl.textContent = minDol===maxDol ? `$${minDol}` : `$${minDol}–$${maxDol}`;
+      }
     }
   });
   const descEl=document.getElementById(`${prefix}-desc`);
@@ -266,8 +272,9 @@ function updateGradeDisplay(dk,id,grade){
     return;
   }
   const col=GRADE_COLORS[grade];
+  const rngStr = g.minDol===g.maxDol ? `$${g.minDol}` : `$${g.minDol}–$${g.maxDol}`;
   if(descEl){descEl.textContent=g.desc;descEl.style.color=col;}
-  if(riskEl){riskEl.textContent='$'+g.riskDol+' risk';riskEl.style.color=col;}
+  if(riskEl){riskEl.textContent=rngStr+' risk';riskEl.style.color=col;}
   if(dispEl){dispEl.textContent=`Grade ${grade}`;dispEl.style.color=col;}
 }
 
@@ -352,11 +359,12 @@ function toggleCollapse(dk){collapsed[dk]=!collapsed[dk];const body=document.get
 function renderGradePanel(dk,t){
   const GRADES = getGrades();
   const prefix=`grade-${dk}-${t.id}`;const grade=t.grade||null;const g=grade?GRADES[grade]:null;
-  const riskStr = g ? '$'+g.riskDol+' risk' : '—';
+  const riskStr = g ? (g.minDol===g.maxDol ? `$${g.minDol}` : `$${g.minDol}–$${g.maxDol}`)+' risk' : '—';
   const col=grade?GRADE_COLORS[grade]:'';
   const btns=Object.entries(GRADE_TIERS).map(([k])=>{
-    const rDol = GRADES[k].riskDol;
-    return `<button class="grade-btn${grade===k?' active':''}" data-grade="${k}" id="${prefix}-btn-${k}" onclick="setGrade('${dk}',${t.id},'${k}')"><span class="grade-letter">${k}</span><span class="grade-pct">$${rDol}</span></button>`;
+    const { minDol, maxDol } = GRADES[k];
+    const rngStr = minDol===maxDol ? `$${minDol}` : `$${minDol}–$${maxDol}`;
+    return `<button class="grade-btn${grade===k?' active':''}" data-grade="${k}" id="${prefix}-btn-${k}" onclick="setGrade('${dk}',${t.id},'${k}')"><span class="grade-letter">${k}</span><span class="grade-pct">${rngStr}</span></button>`;
   }).join('');
   return `<div class="grade-panel"><div class="grade-panel-header"><span class="grade-panel-label">Trade Grade</span><span class="grade-selected-display" id="${prefix}-display" style="color:${col}">${grade?`Grade ${grade}`:'Grade —'}</span></div><div class="grade-btns">${btns}</div><div class="grade-result"><span class="grade-result-desc" id="${prefix}-desc" style="color:${col}">${g?g.desc:'No grade assigned'}</span><span class="grade-result-risk" id="${prefix}-risk" style="color:${col}">${riskStr}</span></div></div>`;
 }
