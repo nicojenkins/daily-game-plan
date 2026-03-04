@@ -160,7 +160,7 @@
 </div>
 <script>
 const STORAGE_KEY='dgp_journal_v2',SETTINGS_KEY='dgp_settings_v1',THEME_KEY='dgp_theme_v1';
-const POLYGON_KEY='2UzhPEeHv7rRDqYbeg0ocy2XBA2hwUFN';
+const TWELVE_KEY='ea4fa67ba897494ab3b7b9da3b3c8731';
 
 const GRADES={
   'A+': {min:60, max:80, riskDol:80, desc:'Exceptional outlier · Full conviction'},
@@ -195,7 +195,6 @@ function updateField(dk,id,side,field,value){const t=getTicker(dk,id);if(!t)retu
 function updateStat(dk,id,field,value){const t=getTicker(dk,id);if(!t)return;if(!t.stats)t.stats={};t.stats[field]=value;saveJournal();if(field==='change'){const el=document.getElementById(`stat-change-${dk}-${id}`);if(el){const v=parseFloat(value);el.className=isNaN(v)?'':(v>=0?'pos':'neg');}}}
 function getTicker(dk,id){const day=journal[dk];if(!day)return null;return day.tickers.find(t=>t.id===id)||null;}
 
-// Returns risk dollars for THIS ticker only — never touches the header
 function getRiskDol(t){
   if(t.grade && GRADES[t.grade]) return GRADES[t.grade].riskDol;
   const acct=parseFloat(document.getElementById('accountSize').value)||25500;
@@ -203,7 +202,6 @@ function getRiskDol(t){
   return (acct*rpct)/100;
 }
 
-// Grade selection: only updates this ticker, never touches header or other cards
 function setGrade(dk,id,grade){
   const t=getTicker(dk,id);
   if(!t)return;
@@ -237,28 +235,56 @@ function updateGradeDisplay(dk,id,grade){
   if(dispEl){dispEl.textContent=`Grade ${grade}`;dispEl.style.color=col;}
 }
 
+// ── FETCH STATS via Twelve Data ──────────────────────────────────────────────
 async function fetchStats(dk,id){
   const t=getTicker(dk,id);if(!t)return;
   const btn=document.getElementById(`fetch-${dk}-${id}`);
   if(btn){btn.textContent='...';btn.classList.add('loading');}
   try{
     if(!t.stats)t.stats={};
-    const aggRes=await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/prev?adjusted=true&apiKey=${POLYGON_KEY}`);
-    const aggData=await aggRes.json();const bar=aggData?.results?.[0];
-    if(bar){t.stats.price=bar.c?bar.c.toFixed(2):t.stats.price;t.stats.cvol=bar.v?formatVol(bar.v):t.stats.cvol;t.stats.avgvol=bar.v?formatVol(bar.v):t.stats.avgvol;if(bar.o&&bar.c)t.stats.change=((bar.c-bar.o)/bar.o*100).toFixed(2);}
-    const dRes=await fetch(`https://api.polygon.io/v3/reference/tickers/${t.sym}?apiKey=${POLYGON_KEY}`);
-    const dData=await dRes.json();const det=dData?.results;
-    if(det){if(det.share_class_shares_outstanding)t.stats.float=formatVol(det.share_class_shares_outstanding);if(det.market_cap)t.stats.mktcap=formatMktCap(det.market_cap);}
-    const rsiRes=await fetch(`https://api.polygon.io/v1/indicators/rsi/${t.sym}?timespan=day&window=14&series_type=close&limit=1&apiKey=${POLYGON_KEY}`);
-    const rsiData=await rsiRes.json();const rv=rsiData?.results?.values?.[0]?.value;if(rv)t.stats.rsi=rv.toFixed(1);
-    const today=new Date();const from=new Date(today);from.setDate(from.getDate()-40);
-    const atrRes=await fetch(`https://api.polygon.io/v2/aggs/ticker/${t.sym}/range/1/day/${from.toISOString().slice(0,10)}/${today.toISOString().slice(0,10)}?adjusted=true&sort=desc&limit=20&apiKey=${POLYGON_KEY}`);
-    const atrData=await atrRes.json();const bars=atrData?.results;
-    if(bars&&bars.length>=2){const trV=[];for(let i=0;i<bars.length-1;i++){trV.push(Math.max(bars[i].h-bars[i].l,Math.abs(bars[i].h-bars[i+1].c),Math.abs(bars[i].l-bars[i+1].c)));}t.stats.atr=(trV.slice(0,14).reduce((a,b)=>a+b,0)/Math.min(trV.length,14)).toFixed(2);}
+
+    // 1. Quote — price, change %, volume
+    const qRes=await fetch(`https://api.twelvedata.com/quote?symbol=${t.sym}&apikey=${TWELVE_KEY}`);
+    const q=await qRes.json();
+    if(q && q.close){
+      t.stats.price=parseFloat(q.close).toFixed(2);
+      if(q.percent_change) t.stats.change=parseFloat(q.percent_change).toFixed(2);
+      if(q.volume)         t.stats.cvol=formatVol(parseInt(q.volume));
+      if(q.average_volume) t.stats.avgvol=formatVol(parseInt(q.average_volume));
+    }
+
+    // 2. ATR (14-day)
+    const atrRes=await fetch(`https://api.twelvedata.com/atr?symbol=${t.sym}&interval=1day&time_period=14&outputsize=1&apikey=${TWELVE_KEY}`);
+    const atrData=await atrRes.json();
+    if(atrData.values && atrData.values[0]) t.stats.atr=parseFloat(atrData.values[0].atr).toFixed(2);
+
+    // 3. RSI (14-day)
+    const rsiRes=await fetch(`https://api.twelvedata.com/rsi?symbol=${t.sym}&interval=1day&time_period=14&outputsize=1&apikey=${TWELVE_KEY}`);
+    const rsiData=await rsiRes.json();
+    if(rsiData.values && rsiData.values[0]) t.stats.rsi=parseFloat(rsiData.values[0].rsi).toFixed(1);
+
+    // 4. Statistics — float, market cap, P/E
+    const statsRes=await fetch(`https://api.twelvedata.com/statistics?symbol=${t.sym}&apikey=${TWELVE_KEY}`);
+    const statsData=await statsRes.json();
+    if(statsData.statistics){
+      const st=statsData.statistics;
+      if(st.shares_statistics?.shares_float)    t.stats.float=formatVol(st.shares_statistics.shares_float);
+      if(st.valuations_metrics?.market_capitalization) t.stats.mktcap=formatMktCap(st.valuations_metrics.market_capitalization);
+      if(st.valuations_metrics?.trailing_pe)    t.stats.pe=parseFloat(st.valuations_metrics.trailing_pe).toFixed(1);
+      if(st.financials?.profit_margin)          t.stats.margin=(parseFloat(st.financials.profit_margin)*100).toFixed(1)+'%';
+      if(st.shares_statistics?.short_percent_of_float) t.stats.short=(parseFloat(st.shares_statistics.short_percent_of_float)*100).toFixed(1)+'%';
+    }
+
     saveJournal();renderJournal();
-  }catch(e){console.error(e);if(btn)btn.textContent='Error';setTimeout(()=>{if(btn){btn.textContent='Fetch';btn.classList.remove('loading');}},1500);return;}
+  }catch(e){
+    console.error(e);
+    if(btn)btn.textContent='Error';
+    setTimeout(()=>{if(btn){btn.textContent='Fetch';btn.classList.remove('loading');}},1500);
+    return;
+  }
   if(btn){btn.textContent='Fetch';btn.classList.remove('loading');}
 }
+// ────────────────────────────────────────────────────────────────────────────
 
 function formatVol(n){if(!n)return'—';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n.toString();}
 function formatMktCap(n){if(!n)return'—';if(n>=1e12)return(n/1e12).toFixed(2)+'T';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(0)+'M';return n.toString();}
@@ -266,7 +292,7 @@ function formatMktCap(n){if(!n)return'—';if(n>=1e12)return(n/1e12).toFixed(2)+
 function calcDisplay(dk,id,side){
   const t=getTicker(dk,id);if(!t)return;
   const entry=parseFloat(t[side].entry),exit=parseFloat(t[side].exit),stop=parseFloat(t[side].stop);
-  const rDol=getRiskDol(t); // per-ticker, isolated
+  const rDol=getRiskDol(t);
   const uid=`${dk}-${id}-${side}`;const cls=side==='long'?'active-long':'active-short';
   const set=(s,v,a)=>{const el=document.getElementById(`${s}-${uid}`);if(!el)return;el.textContent=v;el.className='result-value'+(a?` ${cls}`:'');};
   const setEv=(v,a)=>{const el=document.getElementById(`ev-${uid}`);if(!el)return;el.textContent=v;el.className='ev-display'+(a?` ${cls}`:'');};
@@ -277,7 +303,6 @@ function calcDisplay(dk,id,side){
   else{set('profit','—',false);setEv('R:R —',false);}
 }
 
-// recalcAll only fires when account size or risk % header is manually changed
 function recalcAll(){
   saveSettings();
   Object.keys(journal).forEach(dk=>{
