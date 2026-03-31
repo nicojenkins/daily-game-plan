@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Game Plan</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0f1117; --surface: #16191f; --surface2: #1e2128;
     --border: #2a2d35; --border-light: #353840;
     --text: #e2e4e9; --text-dim: #7a7f8e; --text-muted: #4a4f5e;
-    --green: #00c87a; --green-dim: rgba(0,200,122,0.08); --green-mid: #0a362;
+    --green: #00c87a; --green-dim: rgba(0,200,122,0.08); --green-mid: #0a3622;
     --red: #ff4d6a; --red-dim: rgba(255,77,106,0.08); --red-mid: #cc3d55;
-    --gold: #f0b429; --accent: #6c7aff; --accent-dim: rgba(108,122,255,012);
+    --gold: #f0b429; --accent: #6c7aff; --accent-dim: rgba(108,122,255,0.12);
     --grade-ap: #c8f5a0; --grade-ap-dim: rgba(200,245,160,0.10);
     --grade-a: #7dd3fc;  --grade-a-dim: rgba(125,211,252,0.10);
     --grade-b: #fbbf24;  --grade-b-dim: rgba(251,191,36,0.10);
@@ -33,6 +33,8 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; min-height: 100vh; padding: 20px; transition: background 0.2s, color 0.2s; }
   .page-wrap { max-width: 1200px; margin: 0 auto; }
+
+  /* ── HEADER ── */
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
   .header-left h1 { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
   .header-left .subtitle { font-size: 10px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; letter-spacing: 1.5px; text-transform: uppercase; }
@@ -43,6 +45,8 @@
   #accountSize { width: 85px; } #riskPct { width: 45px; } #maxRisk { width: 55px; }
   .theme-toggle { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 6px 12px; transition: all 0.15s; white-space: nowrap; }
   .theme-toggle:hover { border-color: var(--border-light); color: var(--text); }
+
+  /* ── ADD BAR ── */
   .add-bar { display: flex; gap: 10px; margin-bottom: 24px; align-items: stretch; }
   .add-bar input[type=text] { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; padding: 8px 14px; width: 130px; outline: none; text-transform: uppercase; letter-spacing: 1px; transition: border-color 0.15s; }
   .add-bar input[type=text]:focus { border-color: var(--accent); }
@@ -50,16 +54,28 @@
   .add-bar textarea:focus { border-color: var(--border-light); }
   .btn { background: var(--accent); border: none; border-radius: 6px; color: #fff; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; padding: 8px 18px; letter-spacing: 0.5px; transition: opacity 0.15s; white-space: nowrap; }
   .btn:hover { opacity: 0.82; }
-  .date-group { margin-bottom: 32px; }
-  .date-group-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; cursor: pointer; user-select: none; }
-  .date-group-header-left { display: flex; align-items: center; gap: 10px; }
-  .date-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); }
-  .date-label.today { color: var(--accent); }
-  .date-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); padding: 2px 7px; }
-  .collapse-btn { background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; transition: all 0.15s; }
-  .collapse-btn:hover { border-color: var(--border-light); color: var(--text-dim); }
-  .date-divider { flex: 1; height: 1px; background: var(--border); margin: 0 12px; }
+
+  /* ── COMPACT DATE SUMMARY BAR ── */
+  .date-summary-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; user-select: none; transition: border-color 0.15s; flex-wrap: wrap; }
+  .date-summary-bar:hover { border-color: var(--border-light); }
+  .date-summary-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text-dim); white-space: nowrap; min-width: 70px; }
+  .date-summary-label.today { color: var(--accent); }
+  .date-summary-chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .ticker-chip { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 4px; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; }
+  .ticker-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .ticker-chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .date-summary-count { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  .date-summary-toggle { background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 9px; transition: all 0.15s; }
+  .date-summary-toggle:hover { border-color: var(--border-light); color: var(--text-dim); }
+  .fetch-all-btn { background: var(--accent-dim); border: 1px solid var(--accent); border-radius: 4px; color: var(--accent); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 3px 10px; transition: all 0.15s; }
+  .fetch-all-btn:hover { background: var(--accent); color: #fff; }
+
+  /* ── DATE GROUP ── */
+  .date-group { margin-bottom: 20px; }
+  .date-group-body { margin-top: 6px; }
   .date-group-body.collapsed { display: none; }
+
+  /* ── TICKER CARD ── */
   .ticker-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; display: grid; grid-template-columns: 260px 1fr 1fr; transition: border-color 0.15s; }
   .ticker-card:hover { border-color: var(--border-light); }
   .card-left { background: var(--surface2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 12px 14px; gap: 10px; }
@@ -73,8 +89,8 @@
   .fetch-btn.loading { opacity: 0.45; pointer-events: none; }
   .btn-remove { background: transparent; border: 1px solid transparent; border-radius: 4px; color: var(--text-muted); cursor: pointer; font-size: 10px; padding: 3px 6px; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; text-align: center; }
   .btn-remove:hover { border-color: var(--red); color: var(--red); }
-  .refresh-btn { background: transparent; border: 1px solid transparent; border-radius: 4px; color: var(--text-muted); cursor: pointer; font-size: 10px; padding: 3px 6px; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; text-align: center; }
-  .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── STATS GRID ── */
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
   .stat-cell { display: flex; flex-direction: column; gap: 3px; padding: 5px 8px; background: var(--surface2); }
   .stat-cell-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
@@ -82,6 +98,8 @@
   .stat-cell input:focus { border-bottom-color: var(--border-light); color: var(--text); }
   .stat-cell input.pos { color: var(--green); } .stat-cell input.neg { color: var(--red); }
   .stat-cell input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+  /* ── GRADE PANEL ── */
   .grade-panel { border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
   .grade-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; background: var(--surface); border-bottom: 1px solid var(--border); }
   .grade-panel-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
@@ -98,6 +116,8 @@
   .grade-result { padding: 6px 8px; background: var(--surface2); display: flex; align-items: center; justify-content: space-between; min-height: 30px; }
   .grade-result-desc { font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; color: var(--text-muted); font-style: italic; transition: color 0.2s; }
   .grade-result-risk { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--text-muted); transition: color 0.2s; }
+
+  /* ── PANELS (Long / Short) ── */
   .panels { display: contents; }
   .panel { padding: 12px 14px; }
   .panel-long { border-right: 1px solid var(--border); background: linear-gradient(160deg, var(--green-dim) 0%, transparent 60%); }
@@ -108,12 +128,20 @@
   .panel-long .panel-title::before { background: var(--green); } .panel-short .panel-title::before { background: var(--red); }
   .setup-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--text-dim); font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; padding: 4px 8px; outline: none; width: 100%; margin-bottom: 8px; }
   .setup-input:focus { border-color: var(--border-light); }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+
+  /* ── FIELD ROWS (Plan + Actual side by side) ── */
+  .field-section-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 4px; margin-top: 2px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 4px; }
+  .field-row-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
   .field { display: flex; flex-direction: column; gap: 3px; }
   .field label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'IBM Plex Mono', monospace; }
   .field input { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 5px 7px; outline: none; width: 100%; transition: border-color 0.15s; }
-  .panel-long .field input:focus { border-color: var(--green-mid); } .panel-short .field input:focus { border-color: var(--red-mid); }
-  .results { border-radius: 5px; padding: 8px 10px; }
+  .field input.actual-field { border-style: dashed; color: var(--gold); }
+  .panel-long .field input:focus { border-color: var(--green-mid); }
+  .panel-short .field input:focus { border-color: var(--red-mid); }
+
+  /* ── RESULTS ── */
+  .results { border-radius: 5px; padding: 8px 10px; margin-bottom: 6px; }
   .panel-long .results { background: rgba(0,200,122,0.06); border: 1px solid rgba(0,200,122,0.15); }
   .panel-short .results { background: rgba(255,77,106,0.06); border: 1px solid rgba(255,77,106,0.15); }
   body.light .panel-long .results { background: rgba(0,122,74,0.06); border: 1px solid rgba(0,122,74,0.20); }
@@ -125,8 +153,21 @@
   .result-value.active-long { color: var(--green); } .result-value.active-short { color: var(--red); }
   .ev-display { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text-muted); }
   .ev-display.active-long { color: var(--green); } .ev-display.active-short { color: var(--red); }
+
+  /* ── REALISED P&L ── */
+  .realised-section { border-radius: 5px; padding: 6px 10px; margin-top: 4px; }
+  .panel-long .realised-section { background: rgba(0,200,122,0.03); border: 1px dashed rgba(0,200,122,0.20); }
+  .panel-short .realised-section { background: rgba(255,77,106,0.03); border: 1px dashed rgba(255,77,106,0.20); }
+  .realised-header { font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 4px; }
+  .realised-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .realised-value { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; }
+  .realised-value.pos { color: var(--green); } .realised-value.neg { color: var(--red); }
+
+  /* ── EMPTY STATE ── */
   .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
   .empty-state .glyph { font-size: 28px; margin-bottom: 10px; opacity: 0.2; }
+
+  /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -134,75 +175,86 @@
 </head>
 <body>
 <div class="page-wrap">
-<div class="header">
-  <div class="header-left">
-    <h1>Daily Game Plan</h1>
-    <div class="subtitle">Trade Calculator &amp; Journal</div>
+  <div class="header">
+    <div class="header-left">
+      <h1>Daily Game Plan</h1>
+      <div class="subtitle">Trade Calculator &amp; Journal</div>
+    </div>
+    <div class="header-right">
+      <div class="config-pill">
+        <label>Account $</label>
+        <input type="number" id="accountSize" value="25500" oninput="saveSettings();recalcAll()">
+      </div>
+      <div class="config-pill">
+        <label>Risk %</label>
+        <input type="number" id="riskPct" value="0.5" step="0.01" oninput="saveSettings();recalcAll()">
+      </div>
+      <div class="config-pill">
+        <label>Max Risk $</label>
+        <input type="number" id="maxRisk" value="100" step="1" oninput="saveSettings();recalcAll()" title="Maximum dollar risk per trade (A+ grade). All grades scale from this.">
+      </div>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">&#9728; Light</button>
+    </div>
   </div>
-  <div class="header-right">
-    <div class="config-pill">
-      <label>Account $</label>
-      <input type="number" id="accountSize" value="25500" oninput="saveSettings();recalcAll()">
-    </div>
-    <div class="config-pill">
-      <label>Risk %</label>
-      <input type="number" id="riskPct" value="0.5" step="0.01" oninput="saveSettings();recalcAll()">
-    </div>
-    <div class="config-pill">
-      <label>Max Risk $</label>
-      <input type="number" id="maxRisk" value="100" step="1" oninput="saveSettings();recalcAll()" title="Maximum dollar risk per trade (A+ grade). All grades scale from this.">
-    </div>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">☀ Light</button>
+  <div class="add-bar">
+    <input type="text" id="newTicker" placeholder="TICKER" maxlength="8" onkeydown="if(event.key==='Enter')addTicker()">
+    <textarea id="newNote" placeholder="Notes / catalyst / setup context..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addTicker();}"></textarea>
+    <button class="btn" onclick="addTicker()">+ Add Ticker</button>
   </div>
+  <div id="journal"></div>
 </div>
-<div class="add-bar">
-  <input type="text" id="newTicker" placeholder="TICKER" maxlength="8" onkeydown="if(event.key==='Enter')addTicker()">
-  <textarea id="newNote" placeholder="Notes / catalyst / setup context..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addTicker();}"></textarea>
-  <button class="btn" onclick="addTicker()">+ Add Ticker</button>
-</div>
-<div id="journal"></div>
-</div>
+
 <script>
-const STORAGE_KEY='dgp_journal_v2',SETTINGS_KEY='dgp_settings_v2',THEME_KEY='dgp_theme_v1';
-const TWELVE_KEY='ea4fa67ba897494ab3b7b9da3b3c8731';
+const STORAGE_KEY='dgp_journal_v3', SETTINGS_KEY='dgp_settings_v3', THEME_KEY='dgp_theme_v1';
+
+// ── PROXY CONFIG ──
+const PROXY_BASE = 'https://finviz-proxy.nicojenkins.workers.dev';
+
 
 // Grade tiers as % ranges of Max Risk
-// A+ = 60–80%, A = 30–40%, B = 10–15%, C = 5%
 const GRADE_TIERS = {
-  'A+': { minPct: 0.60, maxPct: 0.80, desc: 'Exceptional outlier · Full conviction' },
-  'A':  { minPct: 0.30, maxPct: 0.40, desc: 'Unusually strong · Controlled aggression' },
-  'B':  { minPct: 0.10, maxPct: 0.15, desc: 'Situational filler · Restrained' },
-  'C':  { minPct: 0.05, maxPct: 0.05, desc: 'Experimental · Data only' }
+  'A+': { minPct: 0.60, maxPct: 0.80, desc: 'Exceptional outlier \u00b7 Full conviction' },
+  'A':  { minPct: 0.30, maxPct: 0.40, desc: 'Unusually strong \u00b7 Controlled aggression' },
+  'B':  { minPct: 0.10, maxPct: 0.15, desc: 'Situational filler \u00b7 Restrained' },
+  'C':  { minPct: 0.05, maxPct: 0.05, desc: 'Experimental \u00b7 Data only' }
 };
-
 const GRADE_COLORS={'A+':'var(--grade-ap)','A':'var(--grade-a)','B':'var(--grade-b)','C':'var(--grade-c)'};
 
-// Returns the live GRADES object with dollar ranges derived from current maxRisk setting
 function getGrades() {
   const maxR = parseFloat(document.getElementById('maxRisk').value) || 100;
   const grades = {};
   for (const [k, v] of Object.entries(GRADE_TIERS)) {
     const minDol = Math.round(maxR * v.minPct);
     const maxDol = Math.round(maxR * v.maxPct);
-    // riskDol uses the midpoint for position sizing calculations
     const riskDol = Math.round((minDol + maxDol) / 2);
     grades[k] = { minDol, maxDol, riskDol, desc: v.desc };
   }
   return grades;
 }
 
-let journal={},settings={accountSize:25500,riskPct:0.5,maxRisk:100},collapsed={};
+let journal={}, settings={accountSize:25500,riskPct:0.5,maxRisk:100}, collapsed={};
 
-function toggleTheme(){const l=document.body.classList.toggle('light');document.getElementById('themeToggle').textContent=l?'🌙 Dark':'☀ Light';localStorage.setItem(THEME_KEY,l?'light':'dark');}
-function loadTheme(){const s=localStorage.getItem(THEME_KEY);if(s==='light'){document.body.classList.add('light');document.getElementById('themeToggle').textContent='🌙 Dark';}}
+/* ── THEME ── */
+function toggleTheme(){const l=document.body.classList.toggle('light');document.getElementById('themeToggle').innerHTML=l?'&#9789; Dark':'&#9728; Light';localStorage.setItem(THEME_KEY,l?'light':'dark');}
+function loadTheme(){const s=localStorage.getItem(THEME_KEY);if(s==='light'){document.body.classList.add('light');document.getElementById('themeToggle').innerHTML='&#9789; Dark';}}
+
+/* ── UTILS ── */
 function todayKey(){return new Date().toISOString().slice(0,10);}
-function formatDateLabel(k){const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});}
+function shortDate(k){const[y,m,d]=k.split('-').map(Number);return `${m}/${d}`;}
+function formatDateLabel(k){const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+
+/* ── PERSISTENCE ── */
 function loadAll(){
   try{const j=localStorage.getItem(STORAGE_KEY);if(j)journal=JSON.parse(j);}catch(e){journal={};}
+  // Migrate from v2 if v3 is empty
+  if(!Object.keys(journal).length){
+    try{const j2=localStorage.getItem('dgp_journal_v2');if(j2){journal=JSON.parse(j2);saveJournal();}}catch(e){}
+  }
   try{const s=localStorage.getItem(SETTINGS_KEY);if(s)settings=JSON.parse(s);}catch(e){}
+  if(!settings.maxRisk) settings.maxRisk=100;
   document.getElementById('accountSize').value=settings.accountSize;
   document.getElementById('riskPct').value=settings.riskPct;
-  document.getElementById('maxRisk').value=settings.maxRisk||100;
+  document.getElementById('maxRisk').value=settings.maxRisk;
 }
 function saveJournal(){localStorage.setItem(STORAGE_KEY,JSON.stringify(journal));}
 function saveSettings(){
@@ -212,122 +264,170 @@ function saveSettings(){
   localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
 }
 
+/* ── ADD / REMOVE ── */
 function addTicker(){
   const sym=document.getElementById('newTicker').value.trim().toUpperCase();
   if(!sym)return;
   const note=document.getElementById('newNote').value.trim();
   const key=todayKey();
   if(!journal[key])journal[key]={tickers:[]};
-  journal[key].tickers.push({id:Date.now(),sym,note,grade:null,stats:{price:'',change:'',float:'',atr:'',cvol:'',avgvol:'',relvol:'',short:'',pe:'',margin:'',rsi:'',mktcap:''},long:{setup:'',entry:'',exit:'',stop:''},short:{setup:'',entry:'',exit:'',stop:''}});
-  saveJournal();document.getElementById('newTicker').value='';document.getElementById('newNote').value='';renderJournal();document.getElementById('newTicker').focus();
+  journal[key].tickers.push({
+    id:Date.now(), sym, note, grade:null,
+    stats:{price:'',change:'',float:'',atr:'',cvol:'',avgvol:'',relvol:'',short:'',pe:'',margin:'',rsi:'',mktcap:'',beta:'',gap:'',sma20:'',sma50:'',sma200:'',w52hi:'',w52lo:'',shortRatio:''},
+    long:{setup:'',entry:'',exit:'',stop:'',actualEntry:'',actualExit:'',actualStop:''},
+    short:{setup:'',entry:'',exit:'',stop:'',actualEntry:'',actualExit:'',actualStop:''}
+  });
+  saveJournal();
+  document.getElementById('newTicker').value='';
+  document.getElementById('newNote').value='';
+  renderJournal();
+  document.getElementById('newTicker').focus();
 }
-
 function removeTicker(dk,id){if(!journal[dk])return;journal[dk].tickers=journal[dk].tickers.filter(t=>t.id!==id);if(!journal[dk].tickers.length)delete journal[dk];saveJournal();renderJournal();}
+
+/* ── FIELD UPDATES ── */
 function updateField(dk,id,side,field,value){const t=getTicker(dk,id);if(!t)return;t[side][field]=value;saveJournal();calcDisplay(dk,id,side);}
-function updateStat(dk,id,field,value){const t=getTicker(dk,id);if(!t)return;if(!t.stats)t.stats={};t.stats[field]=value;saveJournal();if(field==='change'){const el=document.getElementById(`stat-change-${dk}-${id}`);if(el){const v=parseFloat(value);el.className=isNaN(v)?'':(v>=0?'pos':'neg');}}}
+function updateStat(dk,id,field,value){
+  const t=getTicker(dk,id);if(!t)return;
+  if(!t.stats)t.stats={};
+  t.stats[field]=value;saveJournal();
+  if(field==='change'){const el=document.getElementById(`stat-change-${dk}-${id}`);if(el){const v=parseFloat(value);el.className=isNaN(v)?'':(v>=0?'pos':'neg');}}
+}
 function getTicker(dk,id){const day=journal[dk];if(!day)return null;return day.tickers.find(t=>t.id===id)||null;}
 
+/* ── RISK / GRADE ── */
 function getRiskDol(t) {
   const GRADES = getGrades();
   if (t.grade && GRADES[t.grade]) return GRADES[t.grade].riskDol;
-  // Fallback: account-based risk % if no grade set
   const acct = parseFloat(document.getElementById('accountSize').value) || 25500;
   const rpct = parseFloat(document.getElementById('riskPct').value) || 0.5;
   return (acct * rpct) / 100;
 }
-
 function setGrade(dk,id,grade){
-  const t=getTicker(dk,id);
-  if(!t)return;
+  const t=getTicker(dk,id);if(!t)return;
   t.grade=(t.grade===grade)?null:grade;
-  saveJournal();
-  updateGradeDisplay(dk,id,t.grade);
-  calcDisplay(dk,id,'long');
-  calcDisplay(dk,id,'short');
+  saveJournal();updateGradeDisplay(dk,id,t.grade);calcDisplay(dk,id,'long');calcDisplay(dk,id,'short');
 }
-
 function updateGradeDisplay(dk,id,grade){
   const GRADES = getGrades();
   const g = GRADES[grade];
   const prefix=`grade-${dk}-${id}`;
   Object.keys(GRADE_TIERS).forEach(k=>{
     const b=document.getElementById(`${prefix}-btn-${k}`);
-    if(b) {
-      b.classList.toggle('active',k===grade);
-      // Update the dynamic dollar range label on each button
-      const pctEl = b.querySelector('.grade-pct');
-      if (pctEl) {
-        const { minDol, maxDol } = GRADES[k];
-        pctEl.textContent = minDol===maxDol ? `$${minDol}` : `$${minDol}–$${maxDol}`;
-      }
-    }
+    if(b){b.classList.toggle('active',k===grade);const pctEl=b.querySelector('.grade-pct');if(pctEl){const{minDol,maxDol}=GRADES[k];pctEl.textContent=minDol===maxDol?`$${minDol}`:`$${minDol}\u2013$${maxDol}`;}}
   });
   const descEl=document.getElementById(`${prefix}-desc`);
   const riskEl=document.getElementById(`${prefix}-risk`);
   const dispEl=document.getElementById(`${prefix}-display`);
   if(!g){
     if(descEl){descEl.textContent='No grade assigned';descEl.style.color='';}
-    if(riskEl){riskEl.textContent='—';riskEl.style.color='';}
-    if(dispEl){dispEl.textContent='Grade —';dispEl.style.color='';}
+    if(riskEl){riskEl.textContent='\u2014';riskEl.style.color='';}
+    if(dispEl){dispEl.textContent='Grade \u2014';dispEl.style.color='';}
     return;
   }
   const col=GRADE_COLORS[grade];
-  const rngStr = g.minDol===g.maxDol ? `$${g.minDol}` : `$${g.minDol}–$${g.maxDol}`;
+  const rngStr=g.minDol===g.maxDol?`$${g.minDol}`:`$${g.minDol}\u2013$${g.maxDol}`;
   if(descEl){descEl.textContent=g.desc;descEl.style.color=col;}
   if(riskEl){riskEl.textContent=rngStr+' risk';riskEl.style.color=col;}
   if(dispEl){dispEl.textContent=`Grade ${grade}`;dispEl.style.color=col;}
 }
 
-// ── FETCH STATS via Twelve Data ──────────────────────────────────────────────
-async function fetchStats(dk,id){
-  const t=getTicker(dk,id);if(!t)return;
-  const btn=document.getElementById(`fetch-${dk}-${id}`);
-  if(btn){btn.textContent='...';btn.classList.add('loading');}
-  try{
-    if(!t.stats)t.stats={};
+/* ══════════════════════════════════════════════════════════════════════════
+   FINVIZ ELITE DATA FETCHING
+   Fetches 4 views to cover all needed fields, parses CSV, merges data.
+   ══════════════════════════════════════════════════════════════════════════ */
 
-    const qRes=await fetch(`https://api.twelvedata.com/quote?symbol=${t.sym}&apikey=${TWELVE_KEY}`);
-    const q=await qRes.json();
-    if(q && q.close){
-      t.stats.price=parseFloat(q.close).toFixed(2);
-      if(q.percent_change) t.stats.change=parseFloat(q.percent_change).toFixed(2);
-      if(q.volume)         t.stats.cvol=formatVol(parseInt(q.volume));
-      if(q.average_volume) t.stats.avgvol=formatVol(parseInt(q.average_volume));
-    }
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  // Handle quoted CSV headers
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = lines[i].split(',').map(v => v.replace(/^"|"$/g,'').trim());
+    const obj = {};
+    headers.forEach((h,idx) => obj[h] = vals[idx] || '');
+    rows.push(obj);
+  }
+  return rows;
+}
 
-    const atrRes=await fetch(`https://api.twelvedata.com/atr?symbol=${t.sym}&interval=1day&time_period=14&outputsize=1&apikey=${TWELVE_KEY}`);
-    const atrData=await atrRes.json();
-    if(atrData.values && atrData.values[0]) t.stats.atr=parseFloat(atrData.values[0].atr).toFixed(2);
+async function fetchFinvizView(sym, view) {
+  const url = `${PROXY_BASE}?sym=${encodeURIComponent(sym)}&view=${view}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    throw new Error(`FinViz v${view}: ${res.status} ${errText}`);
+  }
+  const text = await res.text();
+  const rows = parseCSV(text);
+  return rows.find(r => r.Ticker === sym) || rows[0] || {};
+}
 
-    const rsiRes=await fetch(`https://api.twelvedata.com/rsi?symbol=${t.sym}&interval=1day&time_period=14&outputsize=1&apikey=${TWELVE_KEY}`);
-    const rsiData=await rsiRes.json();
-    if(rsiData.values && rsiData.values[0]) t.stats.rsi=parseFloat(rsiData.values[0].rsi).toFixed(1);
+async function fetchStats(dk, id) {
+  const t = getTicker(dk, id); if (!t) return;
+  const btn = document.getElementById(`fetch-${dk}-${id}`);
+  if (btn) { btn.textContent = '...'; btn.classList.add('loading'); }
+  try {
+    if (!t.stats) t.stats = {};
+    // Fetch 4 views in parallel
+    const [v131, v141, v161, v171] = await Promise.all([
+      fetchFinvizView(t.sym, 131),  // Float, Short %, Short Ratio, Avg Vol, Mkt Cap
+      fetchFinvizView(t.sym, 141),  // Rel Vol, Avg Vol, Performance
+      fetchFinvizView(t.sym, 161),  // P/E, Margin, ROE, fundamentals
+      fetchFinvizView(t.sym, 171),  // ATR, RSI, Beta, SMAs, Gap
+    ]);
 
-    const statsRes=await fetch(`https://api.twelvedata.com/statistics?symbol=${t.sym}&apikey=${TWELVE_KEY}`);
-    const statsData=await statsRes.json();
-    if(statsData.statistics){
-      const st=statsData.statistics;
-      if(st.shares_statistics?.shares_float)    t.stats.float=formatVol(st.shares_statistics.shares_float);
-      if(st.valuations_metrics?.market_capitalization) t.stats.mktcap=formatMktCap(st.valuations_metrics.market_capitalization);
-      if(st.valuations_metrics?.trailing_pe)    t.stats.pe=parseFloat(st.valuations_metrics.trailing_pe).toFixed(1);
-      if(st.financials?.profit_margin)          t.stats.margin=(parseFloat(st.financials.profit_margin)*100).toFixed(1)+'%';
-      if(st.shares_statistics?.short_percent_of_float) t.stats.short=(parseFloat(st.shares_statistics.short_percent_of_float)*100).toFixed(1)+'%';
-    }
+    // v131: shares & short data
+    if (v131['Market Cap'])   t.stats.mktcap = formatMktCap(parseFloat(v131['Market Cap']) * 1e6);
+    if (v131['Shares Float']) t.stats.float  = formatVol(parseFloat(v131['Shares Float']) * 1e6);
+    if (v131['Short Float'])  t.stats.short  = v131['Short Float'];
+    if (v131['Short Ratio'])  t.stats.shortRatio = v131['Short Ratio'];
+    if (v131['Average Volume']) t.stats.avgvol = formatVol(parseFloat(v131['Average Volume']) * 1e3);
 
-    saveJournal();renderJournal();
-  }catch(e){
-    console.error(e);
-    if(btn)btn.textContent='Error';
-    setTimeout(()=>{if(btn){btn.textContent='Fetch';btn.classList.remove('loading');}},1500);
+    // v141: relative volume & current vol
+    if (v141['Relative Volume']) t.stats.relvol = v141['Relative Volume'];
+    if (v141['Volume'])          t.stats.cvol   = formatVol(parseInt(v141['Volume']));
+
+    // v161: fundamentals
+    if (v161['Price'])         t.stats.price  = parseFloat(v161['Price']).toFixed(2);
+    if (v161['Change'])        t.stats.change = v161['Change'];
+    if (v161['P/E'])           t.stats.pe     = v161['P/E'];
+    if (v161['Profit Margin']) t.stats.margin = v161['Profit Margin'];
+
+    // v171: technicals
+    if (v171['Average True Range'])              t.stats.atr   = parseFloat(v171['Average True Range']).toFixed(2);
+    if (v171['Relative Strength Index (14)'])    t.stats.rsi   = parseFloat(v171['Relative Strength Index (14)']).toFixed(1);
+    if (v171['Beta'])                            t.stats.beta  = v171['Beta'];
+    if (v171['Gap'])                             t.stats.gap   = v171['Gap'];
+    if (v171['20-Day Simple Moving Average'])    t.stats.sma20 = v171['20-Day Simple Moving Average'];
+    if (v171['50-Day Simple Moving Average'])    t.stats.sma50 = v171['50-Day Simple Moving Average'];
+    if (v171['200-Day Simple Moving Average'])   t.stats.sma200= v171['200-Day Simple Moving Average'];
+    if (v171['52-Week High'])                    t.stats.w52hi = v171['52-Week High'];
+    if (v171['52-Week Low'])                     t.stats.w52lo = v171['52-Week Low'];
+
+    saveJournal(); renderJournal();
+  } catch(e) {
+    console.error('FinViz fetch error:', e);
+    if(btn) btn.textContent = 'Error';
+    setTimeout(()=>{ if(btn){btn.textContent='Fetch';btn.classList.remove('loading');} }, 2000);
     return;
   }
   if(btn){btn.textContent='Fetch';btn.classList.remove('loading');}
 }
-// ────────────────────────────────────────────────────────────────────────────
 
-function formatVol(n){if(!n)return'—';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n.toString();}
-function formatMktCap(n){if(!n)return'—';if(n>=1e12)return(n/1e12).toFixed(2)+'T';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(0)+'M';return n.toString();}
+// Fetch all tickers for a given date
+async function fetchAllForDate(dk) {
+  const day = journal[dk]; if (!day) return;
+  for (const t of day.tickers) {
+    await fetchStats(dk, t.id);
+  }
+}
 
+function formatVol(n){if(!n||isNaN(n))return'\u2014';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n.toString();}
+function formatMktCap(n){if(!n||isNaN(n))return'\u2014';if(n>=1e12)return(n/1e12).toFixed(2)+'T';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(0)+'M';return n.toString();}
+
+/* ── CALCULATION ENGINE ── */
 function calcDisplay(dk,id,side){
   const t=getTicker(dk,id);if(!t)return;
   const entry=parseFloat(t[side].entry),exit=parseFloat(t[side].exit),stop=parseFloat(t[side].stop);
@@ -335,67 +435,229 @@ function calcDisplay(dk,id,side){
   const uid=`${dk}-${id}-${side}`;const cls=side==='long'?'active-long':'active-short';
   const set=(s,v,a)=>{const el=document.getElementById(`${s}-${uid}`);if(!el)return;el.textContent=v;el.className='result-value'+(a?` ${cls}`:'');};
   const setEv=(v,a)=>{const el=document.getElementById(`ev-${uid}`);if(!el)return;el.textContent=v;el.className='ev-display'+(a?` ${cls}`:'');};
-  if(!entry||!stop||isNaN(entry)||isNaN(stop)||entry===stop){set('shares','—',false);set('riskdol','—',false);set('risksh','—',false);set('profit','—',false);setEv('R:R —',false);return;}
-  const rPerSh=Math.abs(entry-stop),shares=Math.floor(rDol/rPerSh),rTotal=(shares*rPerSh).toFixed(2);
-  set('shares',shares.toLocaleString(),true);set('riskdol','$'+rTotal,true);set('risksh','$'+rPerSh.toFixed(2),true);
-  if(!isNaN(exit)&&exit&&exit!==entry){const pPerSh=Math.abs(exit-entry);set('profit','$'+(shares*pPerSh).toFixed(2),true);setEv('EV: '+(pPerSh/rPerSh).toFixed(2)+'R',true);}
-  else{set('profit','—',false);setEv('R:R —',false);}
+
+  if(!entry||!stop||isNaN(entry)||isNaN(stop)||entry===stop){
+    set('shares','\u2014',false);set('riskdol','\u2014',false);set('risksh','\u2014',false);set('profit','\u2014',false);setEv('R:R \u2014',false);
+  } else {
+    const rPerSh=Math.abs(entry-stop),shares=Math.floor(rDol/rPerSh),rTotal=(shares*rPerSh).toFixed(2);
+    set('shares',shares.toLocaleString(),true);set('riskdol','$'+rTotal,true);set('risksh','$'+rPerSh.toFixed(2),true);
+    if(!isNaN(exit)&&exit&&exit!==entry){const pPerSh=Math.abs(exit-entry);set('profit','$'+(shares*pPerSh).toFixed(2),true);setEv('EV: '+(pPerSh/rPerSh).toFixed(2)+'R',true);}
+    else{set('profit','\u2014',false);setEv('R:R \u2014',false);}
+  }
+
+  // Realised P&L from actuals
+  calcRealised(dk, id, side);
+}
+
+function calcRealised(dk, id, side) {
+  const t = getTicker(dk, id); if (!t) return;
+  const uid = `${dk}-${id}-${side}`;
+  const aEntry = parseFloat(t[side].actualEntry);
+  const aExit  = parseFloat(t[side].actualExit);
+  const aStop  = parseFloat(t[side].actualStop);
+  const rDol   = getRiskDol(t);
+
+  const setR = (s, v, cls) => { const el = document.getElementById(`real-${s}-${uid}`); if (!el) return; el.textContent = v; el.className = 'realised-value' + (cls ? ` ${cls}` : ''); };
+
+  if (!aEntry || isNaN(aEntry)) {
+    setR('shares', '\u2014', ''); setR('pnl', '\u2014', ''); setR('r', '\u2014', '');
+    return;
+  }
+
+  // Calc shares from actual entry + actual stop (or planned stop as fallback)
+  const stopRef = (!isNaN(aStop) && aStop) ? aStop : parseFloat(t[side].stop);
+  if (!stopRef || isNaN(stopRef) || stopRef === aEntry) {
+    setR('shares', '\u2014', ''); setR('pnl', '\u2014', ''); setR('r', '\u2014', '');
+    return;
+  }
+
+  const rPerSh = Math.abs(aEntry - stopRef);
+  const shares = Math.floor(rDol / rPerSh);
+  setR('shares', shares.toLocaleString(), '');
+
+  if (!aExit || isNaN(aExit)) {
+    setR('pnl', '\u2014', ''); setR('r', '\u2014', '');
+    return;
+  }
+
+  const pnlPerSh = side === 'long' ? (aExit - aEntry) : (aEntry - aExit);
+  const totalPnl = (shares * pnlPerSh).toFixed(2);
+  const rMultiple = (pnlPerSh / rPerSh).toFixed(2);
+  const pnlCls = parseFloat(totalPnl) >= 0 ? 'pos' : 'neg';
+
+  setR('pnl', (parseFloat(totalPnl)>=0?'+':'') + '$' + totalPnl, pnlCls);
+  setR('r', (parseFloat(rMultiple)>=0?'+':'') + rMultiple + 'R', pnlCls);
 }
 
 function recalcAll(){
   saveSettings();
-  // Refresh all grade button labels to reflect new maxRisk
   Object.keys(journal).forEach(dk=>{
     (journal[dk].tickers||[]).forEach(t=>{
       updateGradeDisplay(dk,t.id,t.grade||null);
-      calcDisplay(dk,t.id,'long');
-      calcDisplay(dk,t.id,'short');
+      calcDisplay(dk,t.id,'long');calcDisplay(dk,t.id,'short');
     });
   });
 }
 
-function toggleCollapse(dk){collapsed[dk]=!collapsed[dk];const body=document.getElementById(`group-body-${dk}`);const btn=document.getElementById(`collapse-btn-${dk}`);if(body)body.classList.toggle('collapsed',collapsed[dk]);if(btn)btn.textContent=collapsed[dk]?'▸ Show':'▾ Hide';}
-
-function renderGradePanel(dk,t){
-  const GRADES = getGrades();
-  const prefix=`grade-${dk}-${t.id}`;const grade=t.grade||null;const g=grade?GRADES[grade]:null;
-  const riskStr = g ? (g.minDol===g.maxDol ? `$${g.minDol}` : `$${g.minDol}–$${g.maxDol}`)+' risk' : '—';
-  const col=grade?GRADE_COLORS[grade]:'';
-  const btns=Object.entries(GRADE_TIERS).map(([k])=>{
-    const { minDol, maxDol } = GRADES[k];
-    const rngStr = minDol===maxDol ? `$${minDol}` : `$${minDol}–$${maxDol}`;
-    return `<button class="grade-btn${grade===k?' active':''}" data-grade="${k}" id="${prefix}-btn-${k}" onclick="setGrade('${dk}',${t.id},'${k}')"><span class="grade-letter">${k}</span><span class="grade-pct">${rngStr}</span></button>`;
-  }).join('');
-  return `<div class="grade-panel"><div class="grade-panel-header"><span class="grade-panel-label">Trade Grade</span><span class="grade-selected-display" id="${prefix}-display" style="color:${col}">${grade?`Grade ${grade}`:'Grade —'}</span></div><div class="grade-btns">${btns}</div><div class="grade-result"><span class="grade-result-desc" id="${prefix}-desc" style="color:${col}">${g?g.desc:'No grade assigned'}</span><span class="grade-result-risk" id="${prefix}-risk" style="color:${col}">${riskStr}</span></div></div>`;
+function toggleCollapse(dk){
+  collapsed[dk]=!collapsed[dk];
+  const body=document.getElementById(`group-body-${dk}`);
+  const btn=document.getElementById(`collapse-btn-${dk}`);
+  if(body)body.classList.toggle('collapsed',collapsed[dk]);
+  if(btn)btn.textContent=collapsed[dk]?'\u25b8 Show':'\u25be Hide';
 }
 
-function renderJournal(){
-  const container=document.getElementById('journal');
-  const keys=Object.keys(journal).sort((a,b)=>b.localeCompare(a));
-  if(!keys.length){container.innerHTML=`<div class="empty-state"><div class="glyph">◈</div>Add your first ticker above to begin</div>`;return;}
-  const today=todayKey();
-  container.innerHTML=keys.map(dk=>{
-    const tickers=journal[dk].tickers||[];const isToday=dk===today;
-    const label=(isToday?'Today — ':'')+formatDateLabel(dk);const isCollapsed=collapsed[dk]||false;
-    const tickerHTML=tickers.length?[...tickers].reverse().map(t=>renderCard(dk,t)).join(''):'<div style="padding:12px 0;color:var(--text-muted);font-size:11px;text-align:center;">No tickers.</div>';
-    return `<div class="date-group"><div class="date-group-header" onclick="toggleCollapse('${dk}')"><div class="date-group-header-left"><span class="date-label ${isToday?'today':''}">${label}</span><span class="date-badge">${tickers.length} ticker${tickers.length!==1?'s':''}</span></div><div class="date-divider"></div><button class="collapse-btn" id="collapse-btn-${dk}" onclick="event.stopPropagation();toggleCollapse('${dk}')">${isCollapsed?'▸ Show':'▾ Hide'}</button></div><div class="date-group-body ${isCollapsed?'collapsed':''}" id="group-body-${dk}">${tickerHTML}</div></div>`;
+/* ══════════════════════════════════════════════════════════════════════════
+   RENDERING
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function renderGradePanel(dk,t){
+  const GRADES=getGrades();const prefix=`grade-${dk}-${t.id}`;const grade=t.grade||null;const g=grade?GRADES[grade]:null;
+  const riskStr=g?(g.minDol===g.maxDol?`$${g.minDol}`:`$${g.minDol}\u2013$${g.maxDol}`)+' risk':'\u2014';
+  const col=grade?GRADE_COLORS[grade]:'';
+  const btns=Object.entries(GRADE_TIERS).map(([k])=>{
+    const{minDol,maxDol}=GRADES[k];const rngStr=minDol===maxDol?`$${minDol}`:`$${minDol}\u2013$${maxDol}`;
+    return `<button class="grade-btn${grade===k?' active':''}" data-grade="${k}" id="${prefix}-btn-${k}" onclick="setGrade('${dk}',${t.id},'${k}')"><span class="grade-letter">${k}</span><span class="grade-pct">${rngStr}</span></button>`;
   }).join('');
-  keys.forEach(dk=>{(journal[dk].tickers||[]).forEach(t=>{calcDisplay(dk,t.id,'long');calcDisplay(dk,t.id,'short');updateGradeDisplay(dk,t.id,t.grade||null);});});
+  return `<div class="grade-panel"><div class="grade-panel-header"><span class="grade-panel-label">Trade Grade</span><span class="grade-selected-display" id="${prefix}-display" style="color:${col}">${grade?`Grade ${grade}`:'Grade \u2014'}</span></div><div class="grade-btns">${btns}</div><div class="grade-result"><span class="grade-result-desc" id="${prefix}-desc" style="color:${col}">${g?g.desc:'No grade assigned'}</span><span class="grade-result-risk" id="${prefix}-risk" style="color:${col}">${riskStr}</span></div></div>`;
+}
+
+function renderPanel(dk,t,side){
+  const cls=side==='long'?'panel-long':'panel-short';
+  const uid=`${dk}-${t.id}-${side}`;
+  const data=t[side];
+  return `<div class="panel ${cls}">
+    <div class="panel-title">${side==='long'?'LONG':'SHORT'}</div>
+    <input class="setup-input" value="${data.setup||''}" placeholder="Setup / notes..." oninput="updateField('${dk}',${t.id},'${side}','setup',this.value)">
+    <div class="field-row-pair">
+      <div>
+        <div class="field-section-label">Plan</div>
+        <div class="field-row">
+          <div class="field"><label>Entry</label><input type="number" value="${data.entry||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','entry',this.value)"></div>
+          <div class="field"><label>Target</label><input type="number" value="${data.exit||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','exit',this.value)"></div>
+          <div class="field"><label>Stop</label><input type="number" value="${data.stop||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','stop',this.value)"></div>
+        </div>
+      </div>
+      <div>
+        <div class="field-section-label">Actual</div>
+        <div class="field-row">
+          <div class="field"><label>Entry</label><input type="number" class="actual-field" value="${data.actualEntry||''}" placeholder="\u2014" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','actualEntry',this.value)"></div>
+          <div class="field"><label>Exit</label><input type="number" class="actual-field" value="${data.actualExit||''}" placeholder="\u2014" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','actualExit',this.value)"></div>
+          <div class="field"><label>Stop</label><input type="number" class="actual-field" value="${data.actualStop||''}" placeholder="\u2014" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','actualStop',this.value)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="results">
+      <div class="results-grid">
+        <div class="result-item"><span class="result-label">Shares</span><span class="result-value" id="shares-${uid}">\u2014</span></div>
+        <div class="result-item"><span class="result-label">Risk $</span><span class="result-value" id="riskdol-${uid}">\u2014</span></div>
+        <div class="result-item"><span class="result-label">Risk/sh</span><span class="result-value" id="risksh-${uid}">\u2014</span></div>
+        <div class="result-item"><span class="result-label">Profit</span><span class="result-value" id="profit-${uid}">\u2014</span></div>
+      </div>
+      <div class="ev-display" id="ev-${uid}">R:R \u2014</div>
+    </div>
+    <div class="realised-section">
+      <div class="realised-header">Realised</div>
+      <div class="realised-grid">
+        <div class="result-item"><span class="result-label">Shares</span><span class="realised-value" id="real-shares-${uid}">\u2014</span></div>
+        <div class="result-item"><span class="result-label">P&L</span><span class="realised-value" id="real-pnl-${uid}">\u2014</span></div>
+        <div class="result-item"><span class="result-label">R Multiple</span><span class="realised-value" id="real-r-${uid}">\u2014</span></div>
+      </div>
+    </div>
+  </div>`;
 }
 
 function renderCard(dk,t){
   const s=t.stats||{};
   const changeCls=(()=>{const v=parseFloat(s.change);return isNaN(v)?'':(v>=0?'pos':'neg');})();
-  const sf=(label,field,ph)=>`<div class="stat-cell"><span class="stat-cell-label">${label}</span><input id="stat-${field==='change'?`change-${dk}-${t.id}`:`${dk}-${t.id}-${field}`}" value="${s[field]||''}" placeholder="${ph||'—'}" class="${field==='change'?changeCls:''}" oninput="updateStat('${dk}',${t.id},'${field}',this.value)"></div>`;
-  return `<div class="ticker-card" id="card-${dk}-${t.id}"><div class="card-left"><div class="card-left-top"><div class="card-left-title"><span class="ticker-symbol">${t.sym}</span><span class="ticker-note">${t.note||''}</span></div><div class="card-left-actions"><button class="fetch-btn" id="fetch-${dk}-${t.id}" onclick="fetchStats('${dk}',${t.id})">Fetch</button><button class="refresh-btn" onclick="fetchStats('${dk}',${t.id})" title="Refresh">↻ Refresh</button><button class="btn-remove" onclick="removeTicker('${dk}',${t.id})" title="Delete">✕ Delete</button></div></div><div class="stats-grid">${sf('Price','price','0.00')}${sf('Chg %','change','0.00%')}${sf('Float','float','—')}${sf('ATR','atr','0.00')}${sf('Cur Vol','cvol','—')}${sf('Avg Vol','avgvol','—')}${sf('Rel Vol','relvol','—')}${sf('Short %','short','—')}${sf('P/E','pe','—')}${sf('Margin','margin','—')}${sf('RSI','rsi','—')}${sf('Mkt Cap','mktcap','—')}</div>${renderGradePanel(dk,t)}</div><div class="panels">${renderPanel(dk,t,'long')}${renderPanel(dk,t,'short')}</div></div>`;
+  const sf=(label,field,ph)=>`<div class="stat-cell"><span class="stat-cell-label">${label}</span><input id="stat-${field==='change'?`change-${dk}-${t.id}`:`${dk}-${t.id}-${field}`}" value="${s[field]||''}" placeholder="${ph||'\u2014'}" class="${field==='change'?changeCls:''}" oninput="updateStat('${dk}',${t.id},'${field}',this.value)"></div>`;
+  return `<div class="ticker-card" id="card-${dk}-${t.id}">
+    <div class="card-left">
+      <div class="card-left-top">
+        <div class="card-left-title">
+          <span class="ticker-symbol">${t.sym}</span>
+          <span class="ticker-note">${t.note||''}</span>
+        </div>
+        <div class="card-left-actions">
+          <button class="fetch-btn" id="fetch-${dk}-${t.id}" onclick="fetchStats('${dk}',${t.id})">Fetch</button>
+          <button class="btn-remove" onclick="removeTicker('${dk}',${t.id})" title="Delete">\u2715 Delete</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        ${sf('Price','price','0.00')}
+        ${sf('Chg %','change','0.00%')}
+        ${sf('Mkt Cap','mktcap','\u2014')}
+        ${sf('Float','float','\u2014')}
+        ${sf('ATR','atr','0.00')}
+        ${sf('RSI','rsi','\u2014')}
+        ${sf('Rel Vol','relvol','\u2014')}
+        ${sf('Cur Vol','cvol','\u2014')}
+        ${sf('Avg Vol','avgvol','\u2014')}
+        ${sf('Short %','short','\u2014')}
+        ${sf('Short Ratio','shortRatio','\u2014')}
+        ${sf('P/E','pe','\u2014')}
+        ${sf('Margin','margin','\u2014')}
+        ${sf('Beta','beta','\u2014')}
+        ${sf('Gap','gap','\u2014')}
+        ${sf('SMA 20','sma20','\u2014')}
+        ${sf('SMA 50','sma50','\u2014')}
+        ${sf('SMA 200','sma200','\u2014')}
+        ${sf('52w Hi','w52hi','\u2014')}
+        ${sf('52w Lo','w52lo','\u2014')}
+      </div>
+      ${renderGradePanel(dk,t)}
+    </div>
+    <div class="panels">
+      ${renderPanel(dk,t,'long')}
+      ${renderPanel(dk,t,'short')}
+    </div>
+  </div>`;
 }
 
-function renderPanel(dk,t,side){
-  const cls=side==='long'?'panel-long':'panel-short';const uid=`${dk}-${t.id}-${side}`;const data=t[side];
-  return `<div class="panel ${cls}"><div class="panel-title">${side==='long'?'LONG':'SHORT'}</div><input class="setup-input" value="${data.setup||''}" placeholder="Setup / notes..." oninput="updateField('${dk}',${t.id},'${side}','setup',this.value)"><div class="field-row"><div class="field"><label>Entry</label><input type="number" value="${data.entry||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','entry',this.value)"></div><div class="field"><label>Target</label><input type="number" value="${data.exit||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','exit',this.value)"></div><div class="field"><label>Stop</label><input type="number" value="${data.stop||''}" placeholder="0.00" step="0.01" oninput="updateField('${dk}',${t.id},'${side}','stop',this.value)"></div></div><div class="results"><div class="results-grid"><div class="result-item"><span class="result-label">Shares</span><span class="result-value" id="shares-${uid}">—</span></div><div class="result-item"><span class="result-label">Risk $</span><span class="result-value" id="riskdol-${uid}">—</span></div><div class="result-item"><span class="result-label">Risk/sh</span><span class="result-value" id="risksh-${uid}">—</span></div><div class="result-item"><span class="result-label">Profit</span><span class="result-value" id="profit-${uid}">—</span></div></div><div class="ev-display" id="ev-${uid}">R:R —</div></div></div>`;
+function renderJournal(){
+  const container=document.getElementById('journal');
+  const keys=Object.keys(journal).sort((a,b)=>b.localeCompare(a));
+  if(!keys.length){container.innerHTML=`<div class="empty-state"><div class="glyph">\u25c8</div>Add your first ticker above to begin</div>`;return;}
+  const today=todayKey();
+
+  container.innerHTML=keys.map(dk=>{
+    const tickers=journal[dk].tickers||[];
+    const isToday=dk===today;
+    const isCollapsed=collapsed[dk]||false;
+    const dateLabel=isToday?`Today \u2014 ${formatDateLabel(dk)}`:formatDateLabel(dk);
+
+    // Compact summary bar with ticker chips
+    const chips=tickers.map(t=>`<span class="ticker-chip" onclick="event.stopPropagation();scrollToCard('${dk}',${t.id})">${t.sym}</span>`).join('');
+
+    const summaryBar=`<div class="date-summary-bar" onclick="toggleCollapse('${dk}')">
+      <span class="date-summary-label ${isToday?'today':''}">${shortDate(dk)}</span>
+      <span class="date-summary-label ${isToday?'today':''}" style="font-weight:400;font-size:11px;">${dateLabel}</span>
+      <div class="date-summary-chips">${chips}</div>
+      <span class="date-summary-count">${tickers.length} ticker${tickers.length!==1?'s':''}</span>
+      <button class="fetch-all-btn" onclick="event.stopPropagation();fetchAllForDate('${dk}')" title="Fetch all tickers for this date">Fetch All</button>
+      <button class="date-summary-toggle" id="collapse-btn-${dk}" onclick="event.stopPropagation();toggleCollapse('${dk}')">${isCollapsed?'\u25b8 Show':'\u25be Hide'}</button>
+    </div>`;
+
+    const tickerHTML=tickers.length?[...tickers].reverse().map(t=>renderCard(dk,t)).join(''):'';
+
+    return `<div class="date-group">${summaryBar}<div class="date-group-body ${isCollapsed?'collapsed':''}" id="group-body-${dk}">${tickerHTML}</div></div>`;
+  }).join('');
+
+  // Run calculations after render
+  keys.forEach(dk=>{(journal[dk].tickers||[]).forEach(t=>{calcDisplay(dk,t.id,'long');calcDisplay(dk,t.id,'short');updateGradeDisplay(dk,t.id,t.grade||null);});});
 }
 
-loadAll();loadTheme();renderJournal();document.getElementById('newTicker').focus();
+function scrollToCard(dk, id) {
+  // Ensure group is expanded
+  if (collapsed[dk]) toggleCollapse(dk);
+  setTimeout(() => {
+    const card = document.getElementById(`card-${dk}-${id}`);
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
+}
+
+/* ── INIT ── */
+loadAll(); loadTheme(); renderJournal(); document.getElementById('newTicker').focus();
 </script>
 </body>
 </html>
